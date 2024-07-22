@@ -29,7 +29,7 @@ class _MyChooseAccPageState extends State<MyChooseAccPage> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Image.asset(
-                'assets/images/nooooo.jpg',
+                'assets/images/logo.png',
                 width: 80,
                 height: 100,
               ),

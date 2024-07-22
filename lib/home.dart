@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'widget.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class MyHomePage extends StatefulWidget {
   final String email;
@@ -33,28 +34,35 @@ class _MyHomePageState extends State<MyHomePage> {
           automaticallyImplyLeading: false,
           title: Text(
             'Welcome to Home Page',
-            style: TextStyle(fontFamily: 'Poppins'),
+            style: GoogleFonts.poppins(
+                fontSize: 20, color: Colors.white, fontWeight: FontWeight.bold),
           ),
-          backgroundColor: Color(0xFFFFE382),
+          backgroundColor: Color(0xFF222831),
           elevation: 0.0,
         ),
-        backgroundColor: Color(0xffFFFED3),
         body: Stack(children: [
-          // Background image
-          Container(),
-          Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  FirebaseAuth.instance.currentUser!.email!,
-                  style: GoogleFonts.poppins(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF000000),
+          Container(
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Color(0xFF222831), Colors.black],
+                begin: Alignment.topRight,
+                end: Alignment.bottomLeft,
+              ),
+            ),
+            child: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    FirebaseAuth.instance.currentUser!.email!,
+                    style: GoogleFonts.poppins(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ]));

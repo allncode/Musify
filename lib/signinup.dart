@@ -85,7 +85,7 @@ class _MySignInPageState extends State<MySignInPage> {
                 children: [
                   SizedBox(height: 100),
                   Image.asset(
-                    'assets/images/nooooo.jpg',
+                    'assets/images/logo2.png',
                     width: 200,
                     height: 150,
                   ),
@@ -107,7 +107,8 @@ class _MySignInPageState extends State<MySignInPage> {
                             child: Column(
                               children: [
                                 TextFormField(
-                                  controller: _passwordController,
+                                  style: TextStyle(color: Colors.white),
+                                  controller: _emailController,
                                   decoration: InputDecoration(
                                     border: OutlineInputBorder(),
                                     contentPadding: EdgeInsets.symmetric(
@@ -135,6 +136,7 @@ class _MySignInPageState extends State<MySignInPage> {
                                 ),
                                 const SizedBox(height: 20),
                                 TextFormField(
+                                  style: TextStyle(color: Colors.white),
                                   controller: _passwordController,
                                   decoration: InputDecoration(
                                     border: OutlineInputBorder(),
@@ -173,9 +175,17 @@ class _MySignInPageState extends State<MySignInPage> {
                           Padding(
                             padding: const EdgeInsets.symmetric(vertical: 5.0),
                             child: ElevatedButton(
-                              onPressed: () {
+                              onPressed: () async {
                                 if (_formKey.currentState!.validate()) {
-                                  // Perform login
+                                  try {
+                                    await AuthServices().signIn(
+                                      context: context,
+                                      email: _emailController.text,
+                                      password: _passwordController.text,
+                                    );
+                                  } catch (e) {
+                                    print(e.toString());
+                                  }
                                 }
                               },
                               child: Text(
@@ -226,9 +236,7 @@ class _MySignInPageState extends State<MySignInPage> {
                                 width: 35,
                                 height: 35,
                                 child: ElevatedButton(
-                                  onPressed: () {
-                                    // Your login action here
-                                  },
+                                  onPressed: _signInWithGoogle,
                                   child: Image.asset('assets/images/search.png',
                                       height: 30, width: 30),
                                   style: ButtonStyle(
@@ -383,7 +391,7 @@ class _SignUpPageState extends State<SignUpPage> {
                       child: Column(children: [
                         SizedBox(height: 100),
                         Image.asset(
-                          'assets/images/nooooo.jpg',
+                          'assets/images/logo2.png',
                           width: 200,
                           height: 150,
                         ),
@@ -405,7 +413,9 @@ class _SignUpPageState extends State<SignUpPage> {
                                         child: Column(
                                           children: [
                                             TextFormField(
-                                              controller: _passwordController,
+                                              style: TextStyle(
+                                                  color: Colors.white),
+                                              controller: _emailController,
                                               decoration: InputDecoration(
                                                 border: OutlineInputBorder(),
                                                 contentPadding:
@@ -438,6 +448,8 @@ class _SignUpPageState extends State<SignUpPage> {
                                             ),
                                             const SizedBox(height: 20),
                                             TextFormField(
+                                              style: TextStyle(
+                                                  color: Colors.white),
                                               controller: _passwordController,
                                               decoration: InputDecoration(
                                                 border: OutlineInputBorder(),
@@ -470,12 +482,21 @@ class _SignUpPageState extends State<SignUpPage> {
                                                 if (value == null ||
                                                     value.isEmpty) {
                                                   return 'Please enter your password';
+                                                } else if (!RegExp(
+                                                        r'^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[!@#\$&*~]).{8,}$')
+                                                    .hasMatch(value)) {
+                                                  return 'Password must be at least one A,a,1,@ and 8 characters in length';
+                                                } else if (value !=
+                                                    _passwordController.text) {
+                                                  return 'Passwords do not match';
                                                 }
                                                 return null;
                                               },
                                             ),
                                             const SizedBox(height: 20),
                                             TextFormField(
+                                              style: TextStyle(
+                                                  color: Colors.white),
                                               controller:
                                                   _confirmPasswordController,
                                               decoration: InputDecoration(
@@ -501,7 +522,7 @@ class _SignUpPageState extends State<SignUpPage> {
                                                               .visibility_off,
                                                       color: Color(0xff694F8E)),
                                                   onPressed:
-                                                      _toggleShowPassword,
+                                                      _toggleShowConPassword,
                                                 ),
                                               ),
                                               obscureText: !_showConPassword,
@@ -509,6 +530,13 @@ class _SignUpPageState extends State<SignUpPage> {
                                                 if (value == null ||
                                                     value.isEmpty) {
                                                   return 'Please enter your password';
+                                                } else if (!RegExp(
+                                                        r'^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[!@#\$&*~]).{8,}$')
+                                                    .hasMatch(value)) {
+                                                  return 'Password must be at least one A,a,1,@ and 8 characters in length';
+                                                } else if (value !=
+                                                    _passwordController.text) {
+                                                  return 'Passwords do not match';
                                                 }
                                                 return null;
                                               },
@@ -519,10 +547,22 @@ class _SignUpPageState extends State<SignUpPage> {
                                                   const EdgeInsets.symmetric(
                                                       vertical: 5.0),
                                               child: ElevatedButton(
-                                                onPressed: () {
+                                                onPressed: () async {
                                                   if (_formKey.currentState!
                                                       .validate()) {
-                                                    // Perform login
+                                                    try {
+                                                      await AuthServices()
+                                                          .signup(
+                                                        context: context,
+                                                        email: _emailController
+                                                            .text,
+                                                        password:
+                                                            _passwordController
+                                                                .text,
+                                                      );
+                                                    } catch (e) {
+                                                      print(e.toString());
+                                                    }
                                                   }
                                                 },
                                                 child: Text(
@@ -583,9 +623,8 @@ class _SignUpPageState extends State<SignUpPage> {
                                                   width: 35,
                                                   height: 35,
                                                   child: ElevatedButton(
-                                                    onPressed: () {
-                                                      // Your login action here
-                                                    },
+                                                    onPressed:
+                                                        _signInWithGoogle,
                                                     child: Image.asset(
                                                         'assets/images/search.png',
                                                         height: 30,
