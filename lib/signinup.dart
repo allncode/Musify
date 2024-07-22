@@ -17,6 +17,7 @@ class _MySignInPageState extends State<MySignInPage> {
   TextEditingController _emailController = TextEditingController();
   TextEditingController _passwordController = TextEditingController();
   bool _showPassword = false;
+  final AuthServices _authServices = AuthServices();
 
   @override
   void dispose() {
@@ -228,8 +229,12 @@ class _MySignInPageState extends State<MySignInPage> {
                               SignInButton(
                                 Buttons.facebook,
                                 mini: true,
-                                onPressed: () {
-                                  // Handle Facebook login
+                                onPressed: () async {
+                                  try {
+                                    await _authServices.facebookLogin(context);
+                                  } catch (e) {
+                                    print(e.toString());
+                                  }
                                 },
                               ),
                               SizedBox(
@@ -312,6 +317,7 @@ class _SignUpPageState extends State<SignUpPage> {
   TextEditingController _emailController = TextEditingController();
   TextEditingController _passwordController = TextEditingController();
   TextEditingController _confirmPasswordController = TextEditingController();
+  final AuthServices _authServices = AuthServices();
 
   final _formKey = GlobalKey<FormState>();
 
@@ -615,8 +621,14 @@ class _SignUpPageState extends State<SignUpPage> {
                                                 SignInButton(
                                                   Buttons.facebook,
                                                   mini: true,
-                                                  onPressed: () {
-                                                    // Handle Facebook login
+                                                  onPressed: () async {
+                                                    try {
+                                                      await _authServices
+                                                          .facebookLogin(
+                                                              context);
+                                                    } catch (e) {
+                                                      print(e.toString());
+                                                    }
                                                   },
                                                 ),
                                                 SizedBox(

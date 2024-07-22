@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="facebook_app_id">529734026049010</string>
+    <string name="facebook_client_token">d56cced99fd92abd659570a0e50a0af0</string>
+    <string name="fb_login_protocol_scheme">fb529734026049010</string>
+    <string name="app_name">"My Musify"</string>
+</resources>

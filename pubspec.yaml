@@ -43,6 +43,9 @@ dependencies:
   sign_in_button: ^3.2.0
   flutter_font_icons: ^2.2.7
   google_sign_in: ^6.2.1
+  flutter_login_facebook: ^2.0.1
+  flutter_facebook_auth: ^7.0.1
+  firebase_auth_platform_interface: ^7.0.9
 
 dev_dependencies:
   flutter_test:

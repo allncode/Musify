@@ -1,6 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:myapp/widget.dart';
+import 'package:flutter_login_facebook/flutter_login_facebook.dart';
+import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 
 class AuthServices {
   Future<void> signup({
@@ -73,5 +75,51 @@ class AuthServices {
     await Future.delayed(const Duration(seconds: 1));
     Navigator.pushReplacement(
         context, MaterialPageRoute(builder: (context) => MySignInPage()));
+  }
+
+  Future<void> facebookLogin(BuildContext context) async {
+    try {
+      final fb = FacebookLogin();
+
+      final res = await fb.logIn(permissions: [
+        FacebookPermission.publicProfile,
+        FacebookPermission.email,
+      ]);
+
+      switch (res.status) {
+        case FacebookLoginStatus.success:
+          final FacebookAccessToken? accessToken = res.accessToken;
+          final profile = await fb.getUserProfile();
+          final imageUrl = await fb.getProfileImageUrl(width: 100);
+          final email = await fb.getUserEmail();
+
+          print('Access token: ${accessToken?.token}');
+          print('Hello, ${profile!.name}! Your ID: ${profile.userId}');
+          print('Your profile image: $imageUrl');
+          if (email != null) {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (context) => MyHomePage(
+                  email: email,
+                  username: profile.name ?? 'No Name',
+                  profileImageUrl: imageUrl ?? '',
+                ),
+              ),
+            );
+          } else {
+            print('Failed to get email');
+          }
+          break;
+        case FacebookLoginStatus.cancel:
+          print('Login canceled by user');
+          break;
+        case FacebookLoginStatus.error:
+          print('Error while log in: ${res.error}');
+          break;
+      }
+    } catch (e) {
+      print('Error during Facebook login: $e');
+    }
   }
 }

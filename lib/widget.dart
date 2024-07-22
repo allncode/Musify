@@ -5,3 +5,4 @@ export 'signinup.dart';
 export 'auth/auth_services.dart';
 export 'widget.dart';
 export 'home.dart';
+export 'model.dart';

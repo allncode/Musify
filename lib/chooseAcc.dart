@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_login_facebook/flutter_login_facebook.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'widget.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 
 class MyChooseAccPage extends StatefulWidget {
   const MyChooseAccPage({super.key});
@@ -15,6 +17,7 @@ class _MyChooseAccPageState extends State<MyChooseAccPage> {
   TextEditingController _emailController = TextEditingController();
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final GoogleSignIn _googleSignIn = GoogleSignIn();
+  final AuthServices _authServices = AuthServices();
 
   @override
   void dispose() {
@@ -176,7 +179,13 @@ class _MyChooseAccPageState extends State<MyChooseAccPage> {
                 width: 250,
                 height: 45,
                 child: ElevatedButton(
-                  onPressed: _signInWithGoogle,
+                  onPressed: () async {
+                    try {
+                      await _authServices.facebookLogin(context);
+                    } catch (e) {
+                      print(e.toString());
+                    }
+                  },
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment:
@@ -272,4 +281,6 @@ class _MyChooseAccPageState extends State<MyChooseAccPage> {
       ),
     );
   }
+
+  //https://musify-9f128.firebaseapp.com/__/auth/handler
 }
