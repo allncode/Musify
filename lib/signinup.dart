@@ -86,7 +86,7 @@ class _MySignInPageState extends State<MySignInPage> {
                   SizedBox(height: 100),
                   Image.asset(
                     'assets/images/logo2.png',
-                    width: 200,
+                    width: 150,
                     height: 150,
                   ),
                   Text("Musify",
@@ -392,7 +392,7 @@ class _SignUpPageState extends State<SignUpPage> {
                         SizedBox(height: 100),
                         Image.asset(
                           'assets/images/logo2.png',
-                          width: 200,
+                          width: 150,
                           height: 150,
                         ),
                         Text("Musify",

@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'firebase_options.dart';
 import 'widget.dart';
-import 'package:flutter_font_icons/flutter_font_icons.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class MyChooseAccPage extends StatefulWidget {
   const MyChooseAccPage({super.key});
@@ -13,6 +12,48 @@ class MyChooseAccPage extends StatefulWidget {
 }
 
 class _MyChooseAccPageState extends State<MyChooseAccPage> {
+  TextEditingController _emailController = TextEditingController();
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final GoogleSignIn _googleSignIn = GoogleSignIn();
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _signInWithGoogle() async {
+    try {
+      // Sign out from any currently signed-in account
+      await _googleSignIn.signOut();
+
+      // Sign in with Google and prompt user to choose an account
+      final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
+      if (googleUser != null) {
+        final GoogleSignInAuthentication googleAuth =
+            await googleUser.authentication;
+
+        final credential = GoogleAuthProvider.credential(
+          accessToken: googleAuth.accessToken,
+          idToken: googleAuth.idToken,
+        );
+
+        // Sign in with Firebase using the Google credentials
+        await _auth.signInWithCredential(credential);
+
+        // Navigate to the next page
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(
+            builder: (context) => MyHomePage(email: _emailController.text),
+          ),
+        );
+        print('Signed in as ${googleUser.displayName}');
+      }
+    } catch (error) {
+      print('Error signing in with Google: $error');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -29,9 +70,9 @@ class _MyChooseAccPageState extends State<MyChooseAccPage> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Image.asset(
-                'assets/images/logo.png',
-                width: 80,
-                height: 100,
+                'assets/images/logo2.png',
+                width: 150,
+                height: 150,
               ),
               const SizedBox(height: 20),
               Text(
@@ -87,9 +128,7 @@ class _MyChooseAccPageState extends State<MyChooseAccPage> {
                 width: 250,
                 height: 45,
                 child: ElevatedButton(
-                  onPressed: () {
-                    // Your login action here
-                  },
+                  onPressed: _signInWithGoogle,
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment:
@@ -137,19 +176,19 @@ class _MyChooseAccPageState extends State<MyChooseAccPage> {
                 width: 250,
                 height: 45,
                 child: ElevatedButton(
-                  onPressed: () {
-                    //////////////////////////// Your login action here
-                  },
+                  onPressed: _signInWithGoogle,
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment:
+                        CrossAxisAlignment.center, // Center vertically
                     children: [
-                      Icon(
-                        Icons.facebook,
-                        color: Colors.white,
+                      Image.asset(
+                        'assets/images/facebook.png',
+                        height: 20.0,
                       ),
-                      SizedBox(width: 8.0),
+                      SizedBox(width: 5.0),
                       Text(
-                        'Continue with Facebook',
+                        '  Continue with Google',
                         style: GoogleFonts.poppins(
                           textStyle: TextStyle(
                             color: Colors.white,
@@ -164,16 +203,18 @@ class _MyChooseAccPageState extends State<MyChooseAccPage> {
                       RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(25.0),
                         side: BorderSide(
-                          color: Color(0xff694F8E),
-                          width: 2.0,
-                          style: BorderStyle.solid,
+                          color: Color(0xff694F8E), // Border color
+                          width: 2.0, // Border width
+                          style: BorderStyle
+                              .solid, // Border style: solid, dashed, etc.
                         ),
                       ),
                     ),
                     backgroundColor:
                         WidgetStateProperty.all<Color>(Colors.transparent),
                     padding: WidgetStateProperty.all<EdgeInsets>(
-                        EdgeInsets.symmetric(vertical: 12.0)),
+                      EdgeInsets.symmetric(vertical: 12.0),
+                    ),
                     elevation: WidgetStateProperty.all<double>(2.0),
                   ),
                 ),

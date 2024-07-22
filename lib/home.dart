@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'widget.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 class MyHomePage extends StatefulWidget {
   final String email;
