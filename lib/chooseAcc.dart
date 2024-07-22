@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import 'widget.dart';
+import 'package:flutter_font_icons/flutter_font_icons.dart';
 
 class MyChooseAccPage extends StatefulWidget {
   const MyChooseAccPage({super.key});
@@ -42,105 +43,188 @@ class _MyChooseAccPageState extends State<MyChooseAccPage> {
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              const SizedBox(height: 50),
-              ElevatedButton(
-                onPressed: () {
-                  ///////////////////////////////////// Handle Sign Up button press
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.black,
-                  minimumSize: Size(200, 50),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20),
-                    side: BorderSide(
-                      color: Colors.white,
-                      width: 1,
-                    ),
+              const SizedBox(height: 100),
+              SizedBox(
+                width: 250,
+                height: 45,
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.pushReplacement(context,
+                        MaterialPageRoute(builder: (context) => SignUpPage()));
+                  },
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      SizedBox(width: 8.0),
+                      Text(
+                        'Sign up',
+                        style: GoogleFonts.poppins(
+                          textStyle: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
-                ),
-                child: Text(
-                  'Sign Up',
-                  style: GoogleFonts.poppins(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w500,
+                  style: ButtonStyle(
+                    shape: WidgetStateProperty.all<RoundedRectangleBorder>(
+                      RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(25.0),
+                      ),
+                    ),
+                    backgroundColor:
+                        WidgetStateProperty.all<Color>(Color(0xff694F8E)),
+                    padding: WidgetStateProperty.all<EdgeInsets>(
+                      EdgeInsets.symmetric(vertical: 12.0),
+                    ),
+                    elevation: WidgetStateProperty.all<double>(2.0),
                   ),
                 ),
               ),
               const SizedBox(height: 10),
-              ElevatedButton.icon(
-                onPressed: () {
-                  //////////////////////////////////////// Handle Google button press
-                },
-                icon: Icon(Icons.account_circle),
-                label: Text(
-                  'Continue with Google',
-                  style: GoogleFonts.poppins(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w500,
+              SizedBox(
+                width: 250,
+                height: 45,
+                child: ElevatedButton(
+                  onPressed: () {
+                    // Your login action here
+                  },
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment:
+                        CrossAxisAlignment.center, // Center vertically
+                    children: [
+                      Image.asset(
+                        'assets/images/search.png',
+                        height: 20.0,
+                      ),
+                      SizedBox(width: 5.0),
+                      Text(
+                        '  Continue with Google',
+                        style: GoogleFonts.poppins(
+                          textStyle: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
-                ),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.redAccent,
-                  minimumSize: Size(200, 50),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20),
-                    side: BorderSide(
-                      color: Colors.white,
-                      width: 1,
+                  style: ButtonStyle(
+                    shape: WidgetStateProperty.all<RoundedRectangleBorder>(
+                      RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(25.0),
+                        side: BorderSide(
+                          color: Color(0xff694F8E), // Border color
+                          width: 2.0, // Border width
+                          style: BorderStyle
+                              .solid, // Border style: solid, dashed, etc.
+                        ),
+                      ),
                     ),
+                    backgroundColor:
+                        WidgetStateProperty.all<Color>(Colors.transparent),
+                    padding: WidgetStateProperty.all<EdgeInsets>(
+                      EdgeInsets.symmetric(vertical: 12.0),
+                    ),
+                    elevation: WidgetStateProperty.all<double>(2.0),
                   ),
                 ),
               ),
               const SizedBox(height: 10),
-              ElevatedButton.icon(
-                onPressed: () {
-                  ///////////////////////////////// Handle Facebook button press
-                },
-                icon: Icon(Icons.facebook),
-                label: Text(
-                  'Continue with Facebook',
-                  style: GoogleFonts.poppins(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w500,
+              SizedBox(
+                width: 250,
+                height: 45,
+                child: ElevatedButton(
+                  onPressed: () {
+                    //////////////////////////// Your login action here
+                  },
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.facebook,
+                        color: Colors.white,
+                      ),
+                      SizedBox(width: 8.0),
+                      Text(
+                        'Continue with Facebook',
+                        style: GoogleFonts.poppins(
+                          textStyle: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
-                ),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blueAccent,
-                  minimumSize: Size(200, 50),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20),
-                    side: BorderSide(
-                      color: Colors.white,
-                      width: 1,
+                  style: ButtonStyle(
+                    shape: WidgetStateProperty.all<RoundedRectangleBorder>(
+                      RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(25.0),
+                        side: BorderSide(
+                          color: Color(0xff694F8E),
+                          width: 2.0,
+                          style: BorderStyle.solid,
+                        ),
+                      ),
                     ),
+                    backgroundColor:
+                        WidgetStateProperty.all<Color>(Colors.transparent),
+                    padding: WidgetStateProperty.all<EdgeInsets>(
+                        EdgeInsets.symmetric(vertical: 12.0)),
+                    elevation: WidgetStateProperty.all<double>(2.0),
                   ),
                 ),
               ),
               const SizedBox(height: 10),
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.pushReplacement(context,
-                      MaterialPageRoute(builder: (context) => MySignInPage()));
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.green,
-                  minimumSize: Size(200, 50),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20),
-                    side: BorderSide(
-                      color: Colors.white,
-                      width: 1,
+              SizedBox(
+                width: 250,
+                height: 45,
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(builder: (context) => MySignInPage()),
+                    );
+                  },
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      SizedBox(width: 8.0),
+                      Text(
+                        'Log in',
+                        style: GoogleFonts.poppins(
+                          textStyle: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  style: ButtonStyle(
+                    shape: WidgetStateProperty.all<RoundedRectangleBorder>(
+                      RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(25.0),
+                      ),
                     ),
+                    backgroundColor: WidgetStateProperty.resolveWith<Color>(
+                      (Set<WidgetState> states) {
+                        if (states.contains(WidgetState.pressed)) {
+                          return Color(0xffB692C2); // Color when pressed
+                        }
+                        return Colors.transparent; // Default color
+                      },
+                    ),
+                    padding: WidgetStateProperty.all<EdgeInsets>(
+                      EdgeInsets.symmetric(vertical: 12.0),
+                    ),
+                    elevation: WidgetStateProperty.all<double>(2.0),
                   ),
                 ),
-                child: Text(
-                  'Login',
-                  style: GoogleFonts.poppins(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ),
+              )
             ],
           ),
         ),

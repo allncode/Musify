@@ -4,3 +4,4 @@ export 'chooseAcc.dart';
 export 'signinup.dart';
 export 'auth/auth_services.dart';
 export 'widget.dart';
+export 'home.dart';
