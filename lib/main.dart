@@ -95,6 +95,17 @@ class _MySpotifyState extends State<MySpotify> {
     return allSongs;
   }
 
+  void _handleFavoriteTap() {
+    if (_currentSong != null) {
+      if (Favorites.isFavorite(_currentSong!)) {
+        Favorites.removeSong(_currentSong!);
+      } else {
+        Favorites.addSong(_currentSong!);
+      }
+      setState(() {}); // Refresh the MiniMediaPlayer to reflect the change
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -129,10 +140,7 @@ class _MySpotifyState extends State<MySpotify> {
                       // Handle the three-dots icon tap
                       // Show more options or a menu here
                     },
-                    onFavoriteTap: () {
-                      // Handle the heart icon tap
-                      // Implement favorite functionality here
-                    },
+                    onFavoriteTap: _handleFavoriteTap,
                   )
                 : SizedBox.shrink(),
           )
@@ -250,7 +258,7 @@ class _MySpotifyState extends State<MySpotify> {
               ),
               SizedBox(height: 8.0),
               Container(
-                height: 150.0,
+                height: 170.0,
                 child: ListView(
                   scrollDirection: Axis.horizontal,
                   children: recentlyViewed.reversed.map((viewedItem) {
@@ -269,8 +277,7 @@ class _MySpotifyState extends State<MySpotify> {
                       );
                       return GestureDetector(
                         onTap: () {
-                          Navigator.push(
-                            context,
+                          Navigator.of(context).push(
                             MaterialPageRoute(
                               builder: (context) => AlbumDetailScreen(
                                 title: album.title,
@@ -302,6 +309,7 @@ class _MySpotifyState extends State<MySpotify> {
                   }).toList(),
                 ),
               ),
+              SizedBox(height: 30.0),
             ],
           ],
         ),
@@ -384,18 +392,11 @@ class _MySpotifyState extends State<MySpotify> {
         _addToRecentlyViewed(album.title, album.artist, album.assetPath);
         Navigator.of(context).push(
           MaterialPageRoute(
-            builder: (context) => Scaffold(
-              backgroundColor: Colors.black,
-              appBar: AppBar(
-                title: Text(album.title),
-                backgroundColor: Colors.black,
-              ),
-              body: AlbumDetailScreen(
-                title: album.title,
-                artist: album.artist,
-                assetPath: album.assetPath,
-                songs: album.songs,
-              ),
+            builder: (context) => AlbumDetailScreen(
+              title: album.title,
+              artist: album.artist,
+              assetPath: album.assetPath,
+              songs: album.songs,
             ),
           ),
         );
@@ -403,9 +404,8 @@ class _MySpotifyState extends State<MySpotify> {
       child: Container(
         width: 150.0,
         margin: EdgeInsets.only(right: 8.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
+        child: Stack(
+          children: [
             ClipRRect(
               borderRadius: BorderRadius.circular(8.0),
               child: Image.asset(
@@ -415,165 +415,133 @@ class _MySpotifyState extends State<MySpotify> {
                 fit: BoxFit.cover,
               ),
             ),
-            SizedBox(height: 8.0),
-            Text(
-              album.title,
-              style:
-                  TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+            Positioned(
+              bottom: 8.0,
+              right: 1.0,
+              child: PopupMenuButton<String>(
+                icon: Icon(Icons.more_vert, color: Colors.white),
+                onSelected: (value) {
+                  _handleMenuSelection(value, album);
+                },
+                itemBuilder: (context) => [
+                  PopupMenuItem<String>(
+                    value: 'Option1',
+                    child: Text('Option 1'),
+                  ),
+                  PopupMenuItem<String>(
+                    value: 'Option2',
+                    child: Text('Option 2'),
+                  ),
+                  PopupMenuItem<String>(
+                    value: 'Option3',
+                    child: Text('Option 3'),
+                  ),
+                ],
+              ),
             ),
-            Text(
-              album.artist,
-              style: TextStyle(color: Colors.grey),
+            Positioned(
+              bottom: 8.0,
+              left: 8.0,
+              right: 8.0,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    album.title,
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 12.0,
+                    ),
+                  ),
+                  Text(
+                    album.artist,
+                    style: TextStyle(
+                      color: Colors.grey,
+                      fontSize: 10.0,
+                    ),
+                  ),
+                ],
+              ),
             ),
           ],
         ),
       ),
     );
   }
-}
 
-class Song {
-  final String title;
-  final String artist;
-  final String assetPath;
-
-  Song({
-    required this.title,
-    required this.artist,
-    required this.assetPath,
-  });
-}
-
-class Album {
-  final String title;
-  final String artist;
-  final String assetPath;
-  final List<Song> songs;
-
-  Album({
-    required this.title,
-    required this.artist,
-    required this.assetPath,
-    required this.songs,
-  });
-}
-
-class AlbumDetailScreen extends StatelessWidget {
-  final String title;
-  final String artist;
-  final String assetPath;
-  final List<Song> songs; // Pass the list of songs
-
-  const AlbumDetailScreen({
-    required this.title,
-    required this.artist,
-    required this.assetPath,
-    required this.songs, // Accept the list of songs
-    Key? key,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: Column(
-        children: [
-          Image.asset(
-            assetPath,
-            width: double.infinity,
-            height: 300.0,
-            fit: BoxFit.cover,
-          ),
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 24.0,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                Text(
-                  artist,
-                  style: TextStyle(
-                    color: Colors.grey,
-                    fontSize: 18.0,
-                  ),
-                ),
-                SizedBox(height: 16.0),
-                Text(
-                  'Songs',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 18.0,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                SizedBox(height: 8.0),
-                ListView.builder(
-                  shrinkWrap: true,
-                  physics: NeverScrollableScrollPhysics(),
-                  itemCount: songs.length, // Use the length of the songs list
-                  itemBuilder: (context, index) {
-                    final song = songs[index];
-                    return ListTile(
-                      leading: Icon(Icons.music_note, color: Colors.white),
-                      title: Text(
-                        song.title,
-                        style: TextStyle(color: Colors.white),
-                      ),
-                      subtitle: Text(
-                        song.artist,
-                        style: TextStyle(color: Colors.grey),
-                      ),
-                      onTap: () {
-                        // Handle song tap if needed
-                      },
-                    );
-                  },
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
+  void _handleMenuSelection(String value, Album album) {
+    switch (value) {
+      case 'Option1':
+        // Handle Option 1 action
+        break;
+      case 'Option2':
+        // Handle Option 2 action
+        break;
+      case 'Option3':
+        // Handle Option 3 action
+        break;
+      default:
+        // Handle default case
+        break;
+    }
   }
 }
 
 final List<Album> albums = [
   Album(
-    title: 'Pantropiko',
-    artist: 'BINI',
-    assetPath: 'assets/covers/pantropiko.jpg',
+    title: 'This is Lola Amour',
+    artist: 'Lola Amour',
+    assetPath: 'assets/covers/lolaamour.png',
     songs: [
       Song(
-          title: 'Song 1',
-          artist: 'Artist 1',
-          assetPath: 'assets/images/logo2.png'),
+          title: 'Raining In Manila',
+          artist: 'Lola Amour',
+          assetPath: 'assets/covers/rain.png'),
       Song(
-          title: 'Song 2',
-          artist: 'Artist 2',
-          assetPath: 'assets/images/logo2.png'),
+          title: 'Fallen',
+          artist: 'Lola Amour',
+          assetPath: 'assets/covers/fallen.png'),
+      Song(
+          title: 'dahan-dahan',
+          artist: 'Lola Amour',
+          assetPath: 'assets/covers/dahan.png'),
+      Song(
+          title: 'Pwede Ba',
+          artist: 'Lola Amour',
+          assetPath: 'assets/covers/pwede.png'),
+      Song(
+          title: 'Namimiss Ko Na',
+          artist: 'Lola Amour',
+          assetPath: 'assets/covers/miss.png'),
       // Add more songs here
     ],
   ),
   Album(
-    title: 'Another Album',
-    artist: 'Artist Name',
-    assetPath: 'assets/covers/pantropiko.jpg',
+    title: 'This is Adie',
+    artist: 'Adie',
+    assetPath: 'assets/covers/adie.png',
     songs: [
       Song(
-          title: 'Song A',
-          artist: 'Artist A',
-          assetPath: 'assets/images/logo2.png'),
+          title: 'Mahika',
+          artist: 'Adie',
+          assetPath: 'assets/covers/mahika.png'),
       Song(
-          title: 'Song B',
-          artist: 'Artist B',
-          assetPath: 'assets/images/logo2.png'),
+          title: 'Tahanan',
+          artist: 'Adie',
+          assetPath: 'assets/covers/tahan.png'),
+      Song(
+          title: 'Paraluman',
+          artist: 'Adie',
+          assetPath: 'assets/covers/paraluman.png'),
+      Song(
+          title: 'Oh, Giliw',
+          artist: 'Adie',
+          assetPath: 'assets/covers/giliw.png'),
+      Song(
+          title: 'Kursunada',
+          artist: 'Adie',
+          assetPath: 'assets/covers/kursunada.png'),
       // Add more songs here
     ],
   ),
