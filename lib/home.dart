@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'widget.dart'; // Ensure this import is correct
+import 'widget.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_fonts/google_fonts.dart';
 

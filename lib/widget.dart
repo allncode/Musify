@@ -13,3 +13,4 @@ export 'home/library.dart';
 export 'home/liked_songs.dart';
 export 'home/search.dart';
 export 'home/song.dart';
+export 'home/album_details.dart';

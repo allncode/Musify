@@ -1,15 +1,10 @@
 import 'package:flutter/material.dart';
 import '../widget.dart';
 
-
 class SearchScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Search'),
-        backgroundColor: Colors.black,
-      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -19,12 +14,12 @@ class SearchScreen extends StatelessWidget {
               decoration: InputDecoration(
                 hintText: 'Search songs...',
                 filled: true,
-                fillColor: Colors.grey[800],
+                fillColor: Colors.white,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(10.0),
                   borderSide: BorderSide.none,
                 ),
-                prefixIcon: Icon(Icons.search, color: Colors.white),
+                prefixIcon: Icon(Icons.search, color: Colors.black),
               ),
               style: TextStyle(color: Colors.white),
               onChanged: (query) {
@@ -41,11 +36,11 @@ class SearchScreen extends StatelessWidget {
               child: ListView(
                 children: <Widget>[
                   _buildSearchResultCard(
-                      'Song 1', 'Artist 1', 'assets/album1.jpg'),
+                      'Song 1', 'Artist 1', 'assets/images/logo2.png'),
                   _buildSearchResultCard(
-                      'Song 2', 'Artist 2', 'assets/album2.jpg'),
+                      'Song 2', 'Artist 2', 'assets/images/logo2.png'),
                   _buildSearchResultCard(
-                      'Song 3', 'Artist 3', 'assets/album3.jpg'),
+                      'Song 3', 'Artist 3', 'assets/images/logo2.png'),
                   // Add more search result cards as needed
                 ],
               ),
