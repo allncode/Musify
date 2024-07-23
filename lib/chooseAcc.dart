@@ -35,9 +35,17 @@ class _MyChooseAccPageState extends State<MyChooseAccPage> {
           idToken: googleAuth.idToken,
         );
         await _auth.signInWithCredential(credential);
+
+        final String? username = googleUser.displayName;
+        final String? profileImageUrl = googleUser.photoUrl;
+
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(
-            builder: (context) => MyHomePage(email: _emailController.text),
+            builder: (context) => MyHomePage(
+              email: googleUser.email,
+              username: username,
+              profileImageUrl: profileImageUrl,
+            ),
           ),
         );
         print('Signed in as ${googleUser.displayName}');

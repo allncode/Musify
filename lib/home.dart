@@ -24,34 +24,86 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        actions: [
-          IconButton(
-            icon: Icon(Icons.logout),
-            tooltip: 'Logout',
-            onPressed: () async {
-              await AuthServices().signOut(context: context);
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (context) => MyChooseAccPage()),
-              );
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('Successfully Logged Out')),
-              );
-            },
-          ),
-        ],
+        leading: Builder(
+          builder: (BuildContext context) {
+            return IconButton(
+              icon: CircleAvatar(
+                backgroundImage: widget.profileImageUrl != null
+                    ? NetworkImage(widget.profileImageUrl!)
+                    : null,
+              ),
+              onPressed: () {
+                Scaffold.of(context).openDrawer();
+              },
+            );
+          },
+        ),
+        title: Text(
+          'Musify',
+          style: GoogleFonts.poppins(
+              fontSize: 15, color: Colors.white, fontWeight: FontWeight.w400),
+        ),
         centerTitle: true,
         automaticallyImplyLeading: false,
-        title: Text(
-          'Welcome to Home Page',
-          style: GoogleFonts.poppins(
-            fontSize: 20,
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
         backgroundColor: Color(0xFF222831),
         elevation: 0.0,
+      ),
+      drawer: Drawer(
+        child: Container(
+          color: Color(0xFF222831),
+          child: ListView(
+            padding: EdgeInsets.zero,
+            children: <Widget>[
+              UserAccountsDrawerHeader(
+                accountName: widget.username != null
+                    ? Text(widget.username!, style: GoogleFonts.poppins())
+                    : null,
+                accountEmail: Text(widget.email, style: GoogleFonts.poppins()),
+                currentAccountPicture: widget.profileImageUrl != null
+                    ? CircleAvatar(
+                        backgroundImage: NetworkImage(widget.profileImageUrl!),
+                      )
+                    : null,
+                decoration: BoxDecoration(
+                  color: Color(0xFF222831),
+                ),
+              ),
+              ListTile(
+                leading: Icon(Icons.home, color: Colors.white),
+                title: Text('Home',
+                    style: GoogleFonts.poppins(color: Colors.white)),
+                onTap: () {
+                  Navigator.pop(context);
+                },
+              ),
+              ListTile(
+                leading: Icon(Icons.settings, color: Colors.white),
+                title: Text("Settings",
+                    style: GoogleFonts.poppins(color: Colors.white)),
+                onTap: () {
+                  Navigator.pop(context);
+                },
+              ),
+              ListTile(
+                leading: Icon(Icons.logout, color: Colors.white),
+                title: Text('Logout',
+                    style: GoogleFonts.poppins(color: Colors.white)),
+                onTap: () async {
+                  await AuthServices().signOut(context: context);
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (context) => MyChooseAccPage()),
+                  );
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                        content: Text('Successfully Logged Out',
+                            style: GoogleFonts.poppins())),
+                  );
+                },
+              ),
+            ],
+          ),
+        ),
       ),
       body: Stack(
         children: [
@@ -63,37 +115,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 end: Alignment.bottomLeft,
               ),
             ),
-            child: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  if (widget.profileImageUrl != null)
-                    CircleAvatar(
-                      backgroundImage: NetworkImage(widget.profileImageUrl!),
-                      radius: 50,
-                    ),
-                  if (widget.username != null) SizedBox(height: 16),
-                  if (widget.username != null)
-                    Text(
-                      widget.username!,
-                      style: GoogleFonts.poppins(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
-                    ),
-                  SizedBox(height: 8),
-                  Text(
-                    widget.email,
-                    style: GoogleFonts.poppins(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                  ),
-                ],
-              ),
-            ),
+            child: Center(child: MySpotify()),
           ),
         ],
       ),

@@ -27,7 +27,6 @@ class _MySplashScreenState extends State<MySplashScreen>
   void dispose() {
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual,
         overlays: SystemUiOverlay.values);
-    super.dispose();
   }
 
   Widget build(BuildContext context) {
