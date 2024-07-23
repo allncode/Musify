@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_login_facebook/flutter_login_facebook.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'widget.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
+import 'widget.dart';
 
 class MyChooseAccPage extends StatefulWidget {
   const MyChooseAccPage({super.key});
@@ -27,24 +25,16 @@ class _MyChooseAccPageState extends State<MyChooseAccPage> {
 
   Future<void> _signInWithGoogle() async {
     try {
-      // Sign out from any currently signed-in account
       await _googleSignIn.signOut();
-
-      // Sign in with Google and prompt user to choose an account
       final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
       if (googleUser != null) {
         final GoogleSignInAuthentication googleAuth =
             await googleUser.authentication;
-
         final credential = GoogleAuthProvider.credential(
           accessToken: googleAuth.accessToken,
           idToken: googleAuth.idToken,
         );
-
-        // Sign in with Firebase using the Google credentials
         await _auth.signInWithCredential(credential);
-
-        // Navigate to the next page
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(
             builder: (context) => MyHomePage(email: _emailController.text),
@@ -111,18 +101,13 @@ class _MyChooseAccPageState extends State<MyChooseAccPage> {
                       ),
                     ],
                   ),
-                  style: ButtonStyle(
-                    shape: WidgetStateProperty.all<RoundedRectangleBorder>(
-                      RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(25.0),
-                      ),
+                  style: ElevatedButton.styleFrom(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(25.0),
                     ),
-                    backgroundColor:
-                        WidgetStateProperty.all<Color>(Color(0xff694F8E)),
-                    padding: WidgetStateProperty.all<EdgeInsets>(
-                      EdgeInsets.symmetric(vertical: 12.0),
-                    ),
-                    elevation: WidgetStateProperty.all<double>(2.0),
+                    backgroundColor: Color(0xff694F8E),
+                    padding: EdgeInsets.symmetric(vertical: 12.0),
+                    elevation: 2.0,
                   ),
                 ),
               ),
@@ -134,8 +119,6 @@ class _MyChooseAccPageState extends State<MyChooseAccPage> {
                   onPressed: _signInWithGoogle,
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment:
-                        CrossAxisAlignment.center, // Center vertically
                     children: [
                       Image.asset(
                         'assets/images/search.png',
@@ -153,24 +136,17 @@ class _MyChooseAccPageState extends State<MyChooseAccPage> {
                       ),
                     ],
                   ),
-                  style: ButtonStyle(
-                    shape: WidgetStateProperty.all<RoundedRectangleBorder>(
-                      RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(25.0),
-                        side: BorderSide(
-                          color: Color(0xff694F8E), // Border color
-                          width: 2.0, // Border width
-                          style: BorderStyle
-                              .solid, // Border style: solid, dashed, etc.
-                        ),
+                  style: ElevatedButton.styleFrom(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(25.0),
+                      side: BorderSide(
+                        color: Color(0xff694F8E),
+                        width: 2.0,
                       ),
                     ),
-                    backgroundColor:
-                        WidgetStateProperty.all<Color>(Colors.transparent),
-                    padding: WidgetStateProperty.all<EdgeInsets>(
-                      EdgeInsets.symmetric(vertical: 12.0),
-                    ),
-                    elevation: WidgetStateProperty.all<double>(2.0),
+                    backgroundColor: Colors.transparent,
+                    padding: EdgeInsets.symmetric(vertical: 12.0),
+                    elevation: 2.0,
                   ),
                 ),
               ),
@@ -188,8 +164,6 @@ class _MyChooseAccPageState extends State<MyChooseAccPage> {
                   },
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment:
-                        CrossAxisAlignment.center, // Center vertically
                     children: [
                       Image.asset(
                         'assets/images/facebook.png',
@@ -197,7 +171,7 @@ class _MyChooseAccPageState extends State<MyChooseAccPage> {
                       ),
                       SizedBox(width: 5.0),
                       Text(
-                        '  Continue with Google',
+                        '  Continue with Facebook',
                         style: GoogleFonts.poppins(
                           textStyle: TextStyle(
                             color: Colors.white,
@@ -207,24 +181,17 @@ class _MyChooseAccPageState extends State<MyChooseAccPage> {
                       ),
                     ],
                   ),
-                  style: ButtonStyle(
-                    shape: WidgetStateProperty.all<RoundedRectangleBorder>(
-                      RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(25.0),
-                        side: BorderSide(
-                          color: Color(0xff694F8E), // Border color
-                          width: 2.0, // Border width
-                          style: BorderStyle
-                              .solid, // Border style: solid, dashed, etc.
-                        ),
+                  style: ElevatedButton.styleFrom(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(25.0),
+                      side: BorderSide(
+                        color: Color(0xff694F8E),
+                        width: 2.0,
                       ),
                     ),
-                    backgroundColor:
-                        WidgetStateProperty.all<Color>(Colors.transparent),
-                    padding: WidgetStateProperty.all<EdgeInsets>(
-                      EdgeInsets.symmetric(vertical: 12.0),
-                    ),
-                    elevation: WidgetStateProperty.all<double>(2.0),
+                    backgroundColor: Colors.transparent,
+                    padding: EdgeInsets.symmetric(vertical: 12.0),
+                    elevation: 2.0,
                   ),
                 ),
               ),
@@ -254,24 +221,13 @@ class _MyChooseAccPageState extends State<MyChooseAccPage> {
                       ),
                     ],
                   ),
-                  style: ButtonStyle(
-                    shape: WidgetStateProperty.all<RoundedRectangleBorder>(
-                      RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(25.0),
-                      ),
+                  style: ElevatedButton.styleFrom(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(25.0),
                     ),
-                    backgroundColor: WidgetStateProperty.resolveWith<Color>(
-                      (Set<WidgetState> states) {
-                        if (states.contains(WidgetState.pressed)) {
-                          return Color(0xffB692C2); // Color when pressed
-                        }
-                        return Colors.transparent; // Default color
-                      },
-                    ),
-                    padding: WidgetStateProperty.all<EdgeInsets>(
-                      EdgeInsets.symmetric(vertical: 12.0),
-                    ),
-                    elevation: WidgetStateProperty.all<double>(2.0),
+                    backgroundColor: Colors.transparent,
+                    padding: EdgeInsets.symmetric(vertical: 12.0),
+                    elevation: 2.0,
                   ),
                 ),
               )
@@ -281,6 +237,4 @@ class _MyChooseAccPageState extends State<MyChooseAccPage> {
       ),
     );
   }
-
-  //https://musify-9f128.firebaseapp.com/__/auth/handler
 }

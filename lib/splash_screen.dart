@@ -17,7 +17,7 @@ class _MySplashScreenState extends State<MySplashScreen>
   void initState() {
     super.initState();
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersive);
-    Future.delayed(const Duration(seconds: 5), () {
+    Future.delayed(const Duration(seconds: 4), () {
       Navigator.of(context).pushReplacement(
           MaterialPageRoute(builder: (_) => const MyChooseAccPage()));
     });
@@ -27,6 +27,7 @@ class _MySplashScreenState extends State<MySplashScreen>
   void dispose() {
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual,
         overlays: SystemUiOverlay.values);
+    super.dispose();
   }
 
   Widget build(BuildContext context) {
@@ -42,9 +43,9 @@ class _MySplashScreenState extends State<MySplashScreen>
         ),
         child: Center(
           child: Image.asset(
-            'assets/images/spotify3.gif',
-            width: 100,
-            height: 100,
+            'assets/images/logo23.gif',
+            width: 250,
+            height: 250,
           ),
         ),
       ),
