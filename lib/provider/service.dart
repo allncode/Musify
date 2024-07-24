@@ -25,3 +25,23 @@ class FavoriteService {
     return prefs.getStringList(_favoritesKey) ?? [];
   }
 }
+
+// class AudioPlayerService {
+//   static final AudioPlayer _player = AudioPlayer();
+
+//   static void play(String url) async {
+//     await _player.play(AssetSource(url));
+//   }
+
+//   static void pause() {
+//     _player.pause();
+//   }
+
+//   static void stop() {
+//     _player.stop();
+//   }
+
+//   static void dispose() {
+//     _player.dispose();
+//   }
+// }

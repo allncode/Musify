@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:myapp/splash_screen.dart';
 import 'package:myapp/widget.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -242,8 +243,13 @@ class _MySpotifyState extends State<MySpotify> {
               shrinkWrap: true,
               physics: NeverScrollableScrollPhysics(),
               children: <Widget>[
-                _buildSongCard(context, 'Liked Songs', Icons.favorite,
-                    Color(0xff694F8E), LikedSongs()),
+                _buildSongCard(
+                  context,
+                  'Liked Songs',
+                  'images/assets/heart.png',
+                  Color(0xff694F8E),
+                  LikedSongs(),
+                ),
               ],
             ),
             SizedBox(height: 16.0),
@@ -283,24 +289,7 @@ class _MySpotifyState extends State<MySpotify> {
                 }).toList(),
               ),
             ),
-            SizedBox(height: 16.0),
-            if (recentlyPlayed.isNotEmpty) ...[
-              Text(
-                'Recently Played Songs',
-                style: TextStyle(color: Colors.white, fontSize: 18.0),
-              ),
-              SizedBox(height: 8.0),
-              Container(
-                height: 180.0,
-                child: ListView(
-                  scrollDirection: Axis.horizontal,
-                  children: recentlyPlayed.reversed.map((song) {
-                    return _buildSongCardForListView(song);
-                  }).toList(),
-                ),
-              ),
-            ],
-            SizedBox(height: 16.0),
+            SizedBox(height: 8.0),
             if (recentlyViewed.isNotEmpty) ...[
               Text(
                 'Recently Viewed',
@@ -346,6 +335,7 @@ class _MySpotifyState extends State<MySpotify> {
                         title: viewedItem['title']!,
                         artist: viewedItem['artist']!,
                         assetPath: viewedItem['assetPath']!,
+                        mp3Path: viewedItem['mp3Path']!,
                       );
                       return GestureDetector(
                         onTap: () {
@@ -359,7 +349,24 @@ class _MySpotifyState extends State<MySpotify> {
                   }).toList(),
                 ),
               ),
-              SizedBox(height: 100.0),
+            ],
+            SizedBox(height: 16.0),
+            if (recentlyPlayed.isNotEmpty) ...[
+              Text(
+                'Recently Played Songs',
+                style: TextStyle(color: Colors.white, fontSize: 18.0),
+              ),
+              SizedBox(height: 8.0),
+              Container(
+                height: 180.0,
+                child: ListView(
+                  scrollDirection: Axis.horizontal,
+                  children: recentlyPlayed.reversed.map((song) {
+                    return _buildSongCardForListView(song);
+                  }).toList(),
+                ),
+              ),
+              SizedBox(height: 50),
             ],
           ],
         ),
@@ -370,10 +377,10 @@ class _MySpotifyState extends State<MySpotify> {
   Widget _buildSongCardForListView(Song song) {
     return GestureDetector(
       onTap: () {
-        setState(() {
-          _currentSong = song;
-          _addToRecentlyPlayed(song); // Add this line
-        });
+        final playerNotifier =
+            Provider.of<FavoritesNotifier>(context, listen: false);
+        playerNotifier.setCurrentSong(song);
+        _addToRecentlyPlayed(song);
       },
       child: Container(
         width: 120.0,
@@ -386,7 +393,7 @@ class _MySpotifyState extends State<MySpotify> {
               borderRadius: BorderRadius.circular(8.0),
               child: Image.asset(
                 song.assetPath,
-                height: 100.0,
+                height: 120.0,
                 width: 120.0,
                 fit: BoxFit.cover,
               ),
@@ -409,8 +416,8 @@ class _MySpotifyState extends State<MySpotify> {
     );
   }
 
-  Widget _buildSongCard(BuildContext context, String title, IconData icon,
-      Color iconColor, Widget screen) {
+  Widget _buildSongCard(BuildContext context, String title, String imagePath,
+      Color backgroundColor, Widget screen) {
     return Card(
       color: Colors.grey[900],
       margin: EdgeInsets.all(8.0),
@@ -420,24 +427,23 @@ class _MySpotifyState extends State<MySpotify> {
       child: Container(
         padding: EdgeInsets.symmetric(horizontal: 12.0),
         height: 60.0,
-        child: ListTile(
-          contentPadding: EdgeInsets.zero,
-          leading: Icon(icon, color: iconColor, size: 30.0),
-          title: Text(
-            title,
-            style: TextStyle(color: Colors.white, fontSize: 16.0),
-          ),
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => screen,
-                settings: RouteSettings(
-                  arguments: albums,
-                ),
+        child: Row(
+          children: <Widget>[
+            Image.asset(
+              imagePath,
+              width: 30.0,
+              height: 60.0,
+              fit: BoxFit.cover,
+            ),
+            SizedBox(width: 12.0),
+            Expanded(
+              child: Text(
+                title,
+                style: TextStyle(color: Colors.white, fontSize: 16.0),
               ),
-            );
-          },
+            ),
+            // Optional: You can add an icon or another widget here if needed
+          ],
         ),
       ),
     );
@@ -471,7 +477,7 @@ class _MySpotifyState extends State<MySpotify> {
               borderRadius: BorderRadius.circular(3.0),
               child: Image.asset(
                 album.assetPath,
-                height: 150.0,
+                height: 200.0,
                 width: 150.0,
                 fit: BoxFit.cover,
               ),
@@ -480,7 +486,7 @@ class _MySpotifyState extends State<MySpotify> {
               bottom: 8.0,
               right: 1.0,
               child: IconButton(
-                icon: Icon(Icons.more_vert, color: Colors.white),
+                icon: Icon(Icons.more_vert, color: Colors.black),
                 onPressed: () {
                   _showBottomSheet(context, album);
                 },
@@ -496,16 +502,31 @@ class _MySpotifyState extends State<MySpotify> {
                   Text(
                     album.title,
                     style: TextStyle(
-                      color: Colors.white,
+                      color: Colors.black,
                       fontWeight: FontWeight.bold,
                       fontSize: 12.0,
+                      shadows: [
+                        Shadow(
+                          color: Colors.white.withOpacity(1),
+                          offset: Offset(0.5, 0.5),
+                          blurRadius: 2.0,
+                        ),
+                      ],
                     ),
                   ),
                   Text(
                     album.artist,
                     style: TextStyle(
-                      color: Colors.grey,
+                      color: Colors.black87,
                       fontSize: 10.0,
+                      fontWeight: FontWeight.w600,
+                      shadows: [
+                        Shadow(
+                          color: Colors.white.withOpacity(1),
+                          offset: Offset(0, 0),
+                          blurRadius: 1,
+                        ),
+                      ],
                     ),
                   ),
                 ],
@@ -571,25 +592,35 @@ final List<Album> albums = [
     assetPath: 'assets/covers/lolaamour.png',
     songs: [
       Song(
-          title: 'Raining In Manila',
-          artist: 'Lola Amour',
-          assetPath: 'assets/covers/rain.png'),
+        title: 'Raining In Manila',
+        artist: 'Lola Amour',
+        assetPath: 'assets/covers/rain.png',
+        mp3Path: 'assets/music/raining_in_manila.mp3', // Add MP3 path
+      ),
       Song(
-          title: 'Fallen',
-          artist: 'Lola Amour',
-          assetPath: 'assets/covers/fallen.png'),
+        title: 'Fallen',
+        artist: 'Lola Amour',
+        assetPath: 'assets/covers/fallen.png',
+        mp3Path: 'assets/music/fallen.mp3', // Add MP3 path
+      ),
       Song(
-          title: 'dahan-dahan',
-          artist: 'Lola Amour',
-          assetPath: 'assets/covers/dahan.png'),
+        title: 'dahan-dahan',
+        artist: 'Lola Amour',
+        assetPath: 'assets/covers/dahan.png',
+        mp3Path: 'assets/music/dahan_dahan.mp3', // Add MP3 path
+      ),
       Song(
-          title: 'Pwede Ba',
-          artist: 'Lola Amour',
-          assetPath: 'assets/covers/pwede.png'),
+        title: 'Pwede Ba',
+        artist: 'Lola Amour',
+        assetPath: 'assets/covers/pwede.png',
+        mp3Path: 'assets/music/pwede_ba.mp3', // Add MP3 path
+      ),
       Song(
-          title: 'Namimiss Ko Na',
-          artist: 'Lola Amour',
-          assetPath: 'assets/covers/miss.png'),
+        title: 'Namimiss Ko Na',
+        artist: 'Lola Amour',
+        assetPath: 'assets/covers/miss.png',
+        mp3Path: 'assets/music/namimiss_ko_na.mp3', // Add MP3 path
+      ),
       // Add more songs here
     ],
   ),
@@ -599,25 +630,35 @@ final List<Album> albums = [
     assetPath: 'assets/covers/adie.png',
     songs: [
       Song(
-          title: 'Mahika',
-          artist: 'Adie',
-          assetPath: 'assets/covers/mahika.png'),
+        title: 'Mahika',
+        artist: 'Adie',
+        assetPath: 'assets/covers/mahika.png',
+        mp3Path: 'assets/music/mahika.mp3', // Add MP3 path
+      ),
       Song(
-          title: 'Tahanan',
-          artist: 'Adie',
-          assetPath: 'assets/covers/tahan.png'),
+        title: 'Tahanan',
+        artist: 'Adie',
+        assetPath: 'assets/covers/tahan.png',
+        mp3Path: 'assets/music/tahanan.mp3', // Add MP3 path
+      ),
       Song(
-          title: 'Paraluman',
-          artist: 'Adie',
-          assetPath: 'assets/covers/paraluman.png'),
+        title: 'Paraluman',
+        artist: 'Adie',
+        assetPath: 'assets/covers/paraluman.png',
+        mp3Path: 'assets/music/paraluman.mp3', // Add MP3 path
+      ),
       Song(
-          title: 'Oh, Giliw',
-          artist: 'Adie',
-          assetPath: 'assets/covers/giliw.png'),
+        title: 'Oh, Giliw',
+        artist: 'Adie',
+        assetPath: 'assets/covers/giliw.png',
+        mp3Path: 'assets/music/oh_giliw.mp3', // Add MP3 path
+      ),
       Song(
-          title: 'Kursunada',
-          artist: 'Adie',
-          assetPath: 'assets/covers/kursunada.png'),
+        title: 'Kursunada',
+        artist: 'Adie',
+        assetPath: 'assets/covers/kursunada.png',
+        mp3Path: 'assets/music/kursunada.mp3', // Add MP3 path
+      ),
       // Add more songs here
     ],
   ),
@@ -627,25 +668,35 @@ final List<Album> albums = [
     assetPath: 'assets/covers/The 1975.jpeg',
     songs: [
       Song(
-          title: 'About You',
-          artist: 'The 1975',
-          assetPath: 'assets/covers/About you.jpeg'),
+        title: 'About You',
+        artist: 'The 1975',
+        assetPath: 'assets/covers/About you.jpeg',
+        mp3Path: 'assets/music/about_you.mp3', // Add MP3 path
+      ),
       Song(
-          title: 'Somebody Else',
-          artist: 'The 1975',
-          assetPath: 'assets/covers/Somebody Else.jpeg'),
+        title: 'Somebody Else',
+        artist: 'The 1975',
+        assetPath: 'assets/covers/Somebody Else.jpeg',
+        mp3Path: 'assets/music/somebody_else.mp3', // Add MP3 path
+      ),
       Song(
-          title: 'Robbers',
-          artist: 'The 1975',
-          assetPath: 'assets/covers/Robbers.jpeg'),
+        title: 'Robbers',
+        artist: 'The 1975',
+        assetPath: 'assets/covers/Robbers.jpeg',
+        mp3Path: 'assets/music/robbers.mp3', // Add MP3 path
+      ),
       Song(
-          title: 'Its Not Living If Its Not With You',
-          artist: 'The 1975',
-          assetPath: 'assets/covers/ItsNotLivingIfItsNotWithYou.jpeg'),
+        title: 'Its Not Living If Its Not With You',
+        artist: 'The 1975',
+        assetPath: 'assets/covers/ItsNotLivingIfItsNotWithYou.jpeg',
+        mp3Path: 'assets/music/its_not_living.mp3', // Add MP3 path
+      ),
       Song(
-          title: 'Chocolate',
-          artist: 'The 1975',
-          assetPath: 'assets/covers/Chocolate.jpeg'),
+        title: 'Chocolate',
+        artist: 'The 1975',
+        assetPath: 'assets/covers/Chocolate.jpeg',
+        mp3Path: 'assets/music/chocolate.mp3', // Add MP3 path
+      ),
       // Add more songs here
     ],
   ),
@@ -655,25 +706,36 @@ final List<Album> albums = [
     assetPath: 'assets/covers/Taylor Swift.jpg',
     songs: [
       Song(
-          title: 'Fortnight (feat. Post Malone',
-          artist: 'Taylor Swift',
-          assetPath: 'assets/covers/Fortnight feat. Post Malone.jpeg'),
+        title: 'Fortnight (feat. Post Malone',
+        artist: 'Taylor Swift',
+        assetPath: 'assets/covers/Fortnight feat. Post Malone.jpeg',
+        mp3Path: 'assets/music/fortnight_feat_post_malone.mp3', // Add MP3 path
+      ),
       Song(
-          title: 'Cruel Summer',
-          artist: 'Taylor Swift',
-          assetPath: 'assets/covers/Cruel Summer.jpeg'),
+        title: 'Cruel Summer',
+        artist: 'Taylor Swift',
+        assetPath: 'assets/covers/Cruel Summer.jpeg',
+        mp3Path: 'assets/music/cruel_summer.mp3', // Add MP3 path
+      ),
       Song(
-          title: 'I Can Do It With a Broken Heart',
-          artist: 'Taylor Swift',
-          assetPath: 'assets/covers/ICanDoItWithaBrokenHeart.jpeg'),
+        title: 'I Can Do It With a Broken Heart',
+        artist: 'Taylor Swift',
+        assetPath: 'assets/covers/ICanDoItWithaBrokenHeart.jpeg',
+        mp3Path:
+            'assets/music/i_can_do_it_with_a_broken_heart.mp3', // Add MP3 path
+      ),
       Song(
-          title: 'Down Bad',
-          artist: 'Taylor Swift',
-          assetPath: 'assets/covers/Down Bad.jpeg'),
+        title: 'Down Bad',
+        artist: 'Taylor Swift',
+        assetPath: 'assets/covers/Down Bad.jpeg',
+        mp3Path: 'assets/music/down_bad.mp3', // Add MP3 path
+      ),
       Song(
-          title: 'Guilty as Sin?',
-          artist: 'Taylor Swift',
-          assetPath: 'assets/covers/Guilty as Sin.jpeg'),
+        title: 'Guilty as Sin?',
+        artist: 'Taylor Swift',
+        assetPath: 'assets/covers/Guilty as Sin.jpeg',
+        mp3Path: 'assets/music/guilty_as_sin.mp3', // Add MP3 path
+      ),
       // Add more songs here
     ],
   ),

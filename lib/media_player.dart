@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'widget.dart'; // Import your Song class
+import 'widget.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class MiniMediaPlayer extends StatelessWidget {
   final Song song;
@@ -23,7 +24,7 @@ class MiniMediaPlayer extends StatelessWidget {
     final Song? song = favoritesNotifier.currentSong;
 
     if (song == null) {
-      return SizedBox.shrink(); // Return an empty widget if no song is selected
+      return SizedBox.shrink();
     }
 
     return Padding(
@@ -33,7 +34,7 @@ class MiniMediaPlayer extends StatelessWidget {
           borderRadius: BorderRadius.all(Radius.circular(5.0)),
           color: Colors.grey[900],
         ),
-        height: 80,
+        height: 60,
         child: Row(
           children: <Widget>[
             ClipRRect(
@@ -41,7 +42,7 @@ class MiniMediaPlayer extends StatelessWidget {
               child: Image.asset(
                 song.assetPath,
                 width: 70.0,
-                height: 80.0,
+                height: 60.0,
                 fit: BoxFit.cover,
               ),
             ),
@@ -69,12 +70,12 @@ class MiniMediaPlayer extends StatelessWidget {
                 ],
               ),
             ),
-            // Controls for play/pause, favorite, and more options
+            SizedBox(width: 8.0),
             IconButton(
-              icon: Icon(
+              icon: FaIcon(
                 favoritesNotifier.isFavorite(song)
-                    ? Icons.favorite
-                    : Icons.favorite_border,
+                    ? FontAwesomeIcons.solidHeart
+                    : FontAwesomeIcons.heart,
                 color: favoritesNotifier.isFavorite(song)
                     ? Colors.redAccent
                     : Colors.white,
@@ -87,17 +88,13 @@ class MiniMediaPlayer extends StatelessWidget {
                 }
               },
             ),
+            SizedBox(width: 8.0),
             IconButton(
-              icon: Icon(Icons.play_arrow),
-              onPressed: () {
-                // Handle play/pause tap
-              },
-            ),
-            IconButton(
-              icon: Icon(Icons.more_vert),
-              onPressed: () {
-                // Handle more options tap
-              },
+              icon: FaIcon(
+                FontAwesomeIcons.play,
+                color: Colors.white,
+              ),
+              onPressed: onPlayPauseTap,
             ),
           ],
         ),
