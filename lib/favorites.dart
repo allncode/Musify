@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-
+import 'package:provider/provider.dart';
 import 'widget.dart';
 
 class Favorites {
@@ -23,7 +23,8 @@ class Favorites {
 class LikedSongs extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final likedSongs = Favorites.getFavorites();
+    final favoritesNotifier = Provider.of<FavoritesNotifier>(context);
+    final likedSongs = favoritesNotifier.favorites;
 
     return Scaffold(
       appBar: AppBar(
@@ -37,6 +38,23 @@ class LikedSongs extends StatelessWidget {
             leading: Image.asset(song.assetPath),
             title: Text(song.title),
             subtitle: Text(song.artist),
+            trailing: IconButton(
+              icon: Icon(
+                favoritesNotifier.isFavorite(song)
+                    ? Icons.favorite
+                    : Icons.favorite_border,
+                color: favoritesNotifier.isFavorite(song)
+                    ? Colors.redAccent
+                    : Colors.white,
+              ),
+              onPressed: () {
+                if (favoritesNotifier.isFavorite(song)) {
+                  favoritesNotifier.removeSong(song);
+                } else {
+                  favoritesNotifier.addSong(song);
+                }
+              },
+            ),
           );
         },
       ),

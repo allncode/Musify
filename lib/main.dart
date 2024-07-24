@@ -15,7 +15,7 @@ Future<void> main() async {
   );
   runApp(
     ChangeNotifierProvider(
-      create: (context) => FavoritesProvider(),
+      create: (context) => FavoritesNotifier(),
       child: MyApp(),
     ),
   );
@@ -38,6 +38,7 @@ class MyApp extends StatelessWidget {
       routes: {
         '/search': (context) => SearchScreen(),
         '/your_library': (context) => YourLibrary(),
+        '/likesSongs': (context) => LikedSongs(),
       },
     );
   }
@@ -51,12 +52,29 @@ class MySpotify extends StatefulWidget {
 }
 
 class _MySpotifyState extends State<MySpotify> {
-  int _currentIndex = 0;
+  int _selectedIndex = 0;
+  final List<GlobalKey<NavigatorState>> _navigatorKeys = [
+    GlobalKey<NavigatorState>(),
+    GlobalKey<NavigatorState>(),
+    GlobalKey<NavigatorState>(),
+  ];
   final PageController _pageController = PageController();
   List<Map<String, String>> recentlyViewed = [];
   Song? _currentSong;
   List<Song> recentlyPlayed = [];
   bool _isPlaying = false;
+
+  void _onItemTapped(int index) {
+    if (_selectedIndex == index) {
+      // If the user taps the tab bar item twice, it should pop to the first route
+      _navigatorKeys[index].currentState!.popUntil((route) => route.isFirst);
+    } else {
+      setState(() {
+        _selectedIndex = index;
+      });
+      _pageController.jumpToPage(index);
+    }
+  }
 
   void _addToRecentlyViewed(String title, String artist, String assetPath) {
     setState(() {
@@ -130,13 +148,34 @@ class _MySpotifyState extends State<MySpotify> {
             controller: _pageController,
             onPageChanged: (index) {
               setState(() {
-                _currentIndex = index;
+                _selectedIndex = index;
               });
             },
             children: [
-              _buildMusicPage(),
-              SearchScreen(),
-              YourLibrary(),
+              Navigator(
+                key: _navigatorKeys[0],
+                onGenerateRoute: (routeSettings) {
+                  return MaterialPageRoute(
+                    builder: (context) => _buildMusicPage(),
+                  );
+                },
+              ),
+              Navigator(
+                key: _navigatorKeys[1],
+                onGenerateRoute: (routeSettings) {
+                  return MaterialPageRoute(
+                    builder: (context) => SearchScreen(),
+                  );
+                },
+              ),
+              Navigator(
+                key: _navigatorKeys[2],
+                onGenerateRoute: (routeSettings) {
+                  return MaterialPageRoute(
+                    builder: (context) => YourLibrary(),
+                  );
+                },
+              ),
             ],
           ),
           Positioned(
@@ -148,26 +187,22 @@ class _MySpotifyState extends State<MySpotify> {
                     song: _currentSong!,
                     onTap: () {
                       // Handle the play button tap
-                      // Implement navigation to a detailed player screen or other actions
                     },
                     onMoreOptionsTap: () {
                       // Handle the three-dots icon tap
-                      // Show more options or a menu here
                     },
                     onFavoriteTap: _handleFavoriteTap,
                     onPlayPauseTap: _handlePlayPauseTap,
-                    isFavorite: Favorites.isFavorite(
-                        _currentSong!), // Correctly set favorite status
                   )
                 : SizedBox.shrink(),
-          )
+          ),
         ],
       ),
       bottomNavigationBar: BottomNavigationBar(
         backgroundColor: Colors.black,
         selectedItemColor: Color(0xff694F8E),
         unselectedItemColor: Colors.grey,
-        currentIndex: _currentIndex,
+        currentIndex: _selectedIndex,
         items: [
           BottomNavigationBarItem(
             icon: Icon(Icons.home),
@@ -182,9 +217,7 @@ class _MySpotifyState extends State<MySpotify> {
             label: 'Your Library',
           ),
         ],
-        onTap: (index) {
-          _pageController.jumpToPage(index);
-        },
+        onTap: _onItemTapped,
       ),
     );
   }
@@ -435,10 +468,10 @@ class _MySpotifyState extends State<MySpotify> {
         child: Stack(
           children: [
             ClipRRect(
-              borderRadius: BorderRadius.circular(8.0),
+              borderRadius: BorderRadius.circular(3.0),
               child: Image.asset(
                 album.assetPath,
-                height: 120.0,
+                height: 150.0,
                 width: 150.0,
                 fit: BoxFit.cover,
               ),
@@ -492,24 +525,17 @@ class _MySpotifyState extends State<MySpotify> {
         mainAxisSize: MainAxisSize.min,
         children: [
           ListTile(
-            leading: FaIcon(FontAwesomeIcons.heart, color: Colors.white),
-            title: Text('Option 1', style: TextStyle(color: Colors.white)),
-            onTap: () {
-              Navigator.pop(context);
-              _handleMenuSelection('Option1', album);
-            },
-          ),
-          ListTile(
-            leading: FaIcon(FontAwesomeIcons.circleInfo, color: Colors.white),
-            title: Text('Option 2', style: TextStyle(color: Colors.white)),
+            leading: FaIcon(FontAwesomeIcons.circlePlus, color: Colors.white),
+            title:
+                Text('Add to Library', style: TextStyle(color: Colors.white)),
             onTap: () {
               Navigator.pop(context);
               _handleMenuSelection('Option2', album);
             },
           ),
           ListTile(
-            leading: FaIcon(FontAwesomeIcons.circlePlus, color: Colors.white),
-            title: Text('Option 3', style: TextStyle(color: Colors.white)),
+            leading: FaIcon(FontAwesomeIcons.circleInfo, color: Colors.white),
+            title: Text('Song Details', style: TextStyle(color: Colors.white)),
             onTap: () {
               Navigator.pop(context);
               _handleMenuSelection('Option3', album);

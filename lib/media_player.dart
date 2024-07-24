@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
-import 'widget.dart'; // Import your provider file
+import 'widget.dart'; // Import your Song class
 
 class MiniMediaPlayer extends StatelessWidget {
   final Song song;
@@ -9,7 +8,6 @@ class MiniMediaPlayer extends StatelessWidget {
   final VoidCallback onMoreOptionsTap;
   final VoidCallback onFavoriteTap;
   final VoidCallback onPlayPauseTap;
-  final bool isFavorite;
 
   MiniMediaPlayer({
     required this.song,
@@ -17,11 +15,17 @@ class MiniMediaPlayer extends StatelessWidget {
     required this.onMoreOptionsTap,
     required this.onFavoriteTap,
     required this.onPlayPauseTap,
-    required this.isFavorite,
   });
 
   @override
   Widget build(BuildContext context) {
+    final favoritesNotifier = Provider.of<FavoritesNotifier>(context);
+    final Song? song = favoritesNotifier.currentSong;
+
+    if (song == null) {
+      return SizedBox.shrink(); // Return an empty widget if no song is selected
+    }
+
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Container(
@@ -32,7 +36,6 @@ class MiniMediaPlayer extends StatelessWidget {
         height: 80,
         child: Row(
           children: <Widget>[
-            // Song Image
             ClipRRect(
               borderRadius: BorderRadius.circular(3.0),
               child: Image.asset(
@@ -43,10 +46,9 @@ class MiniMediaPlayer extends StatelessWidget {
               ),
             ),
             SizedBox(width: 8.0),
-            // Song Details
             Expanded(
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.center,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
@@ -67,28 +69,35 @@ class MiniMediaPlayer extends StatelessWidget {
                 ],
               ),
             ),
-            // Controls
+            // Controls for play/pause, favorite, and more options
             IconButton(
-              icon: FaIcon(
-                isFavorite
-                    ? FontAwesomeIcons.solidHeart
-                    : FontAwesomeIcons.heart,
-                color: isFavorite ? Color(0xff694F8E) : Colors.white,
-                size: 24.0,
+              icon: Icon(
+                favoritesNotifier.isFavorite(song)
+                    ? Icons.favorite
+                    : Icons.favorite_border,
+                color: favoritesNotifier.isFavorite(song)
+                    ? Colors.redAccent
+                    : Colors.white,
               ),
-              onPressed: onFavoriteTap,
+              onPressed: () {
+                if (favoritesNotifier.isFavorite(song)) {
+                  favoritesNotifier.removeSong(song);
+                } else {
+                  favoritesNotifier.addSong(song);
+                }
+              },
             ),
             IconButton(
-              icon: FaIcon(FontAwesomeIcons.play),
-              onPressed: onPlayPauseTap,
-              color: Colors.white,
-              iconSize: 24.0,
+              icon: Icon(Icons.play_arrow),
+              onPressed: () {
+                // Handle play/pause tap
+              },
             ),
             IconButton(
-              icon: FaIcon(FontAwesomeIcons.ellipsisV),
-              onPressed: onMoreOptionsTap,
-              color: Colors.white,
-              iconSize: 24.0,
+              icon: Icon(Icons.more_vert),
+              onPressed: () {
+                // Handle more options tap
+              },
             ),
           ],
         ),
