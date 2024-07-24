@@ -123,20 +123,47 @@ class _MySpotifyState extends State<MySpotify> {
   }
 
   void _handleFavoriteTap() {
-    if (_currentSong != null) {
-      if (Favorites.isFavorite(_currentSong!)) {
-        Favorites.removeSong(_currentSong!);
-      } else {
-        Favorites.addSong(_currentSong!);
-      }
-      setState(() {}); // Refresh the MiniMediaPlayer to reflect the change
+    final favoritesNotifier =
+        Provider.of<FavoritesNotifier>(context, listen: false);
+
+    if (favoritesNotifier.isFavorite(_currentSong!)) {
+      favoritesNotifier.removeSong(_currentSong!);
+    } else {
+      favoritesNotifier.addSong(_currentSong!);
     }
+
+    setState(() {
+      _currentSong = favoritesNotifier.currentSong;
+    });
   }
 
   void _handlePlayPauseTap() {
     setState(() {
       _isPlaying = !_isPlaying;
     });
+  }
+
+  void _handleSongTap(Song song) {
+    final favoritesNotifier =
+        Provider.of<FavoritesNotifier>(context, listen: false);
+
+    // Update the currently playing song in FavoritesNotifier
+    favoritesNotifier.setCurrentSong(song);
+
+    // Update the MiniMediaPlayer to reflect the new song
+    setState(() {
+      _currentSong = song;
+      _isPlaying = true; // Optional: Start playing the song immediately
+    });
+  }
+
+  void _handleGridItemTap() {
+    // Navigate to the LikedSongs page within the current PageView's Navigator
+    _navigatorKeys[_selectedIndex].currentState?.push(
+          MaterialPageRoute(
+            builder: (context) => LikedSongs(),
+          ),
+        );
   }
 
   @override
@@ -186,12 +213,8 @@ class _MySpotifyState extends State<MySpotify> {
             child: _currentSong != null
                 ? MiniMediaPlayer(
                     song: _currentSong!,
-                    onTap: () {
-                      // Handle the play button tap
-                    },
-                    onMoreOptionsTap: () {
-                      // Handle the three-dots icon tap
-                    },
+                    onTap: () {},
+                    onMoreOptionsTap: () {},
                     onFavoriteTap: _handleFavoriteTap,
                     onPlayPauseTap: _handlePlayPauseTap,
                   )
@@ -243,12 +266,14 @@ class _MySpotifyState extends State<MySpotify> {
               shrinkWrap: true,
               physics: NeverScrollableScrollPhysics(),
               children: <Widget>[
-                _buildSongCard(
-                  context,
-                  'Liked Songs',
-                  'images/assets/heart.png',
-                  Color(0xff694F8E),
-                  LikedSongs(),
+                GestureDetector(
+                  onTap: _handleGridItemTap,
+                  child: _buildSongCard(
+                      context,
+                      'Liked Songs',
+                      'assets/images/heart.png',
+                      Color(0xff694F8E),
+                      LikedSongs()),
                 ),
               ],
             ),
@@ -381,6 +406,9 @@ class _MySpotifyState extends State<MySpotify> {
             Provider.of<FavoritesNotifier>(context, listen: false);
         playerNotifier.setCurrentSong(song);
         _addToRecentlyPlayed(song);
+        setState(() {
+          _currentSong = song;
+        });
       },
       child: Container(
         width: 120.0,
@@ -425,14 +453,14 @@ class _MySpotifyState extends State<MySpotify> {
         borderRadius: BorderRadius.circular(5.0),
       ),
       child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 12.0),
+        padding: EdgeInsets.only(right: 12.0),
         height: 60.0,
         child: Row(
           children: <Widget>[
             Image.asset(
               imagePath,
-              width: 30.0,
-              height: 60.0,
+              width: 60.0,
+              height: 65.0,
               fit: BoxFit.cover,
             ),
             SizedBox(width: 12.0),
@@ -584,160 +612,3 @@ class _MySpotifyState extends State<MySpotify> {
     }
   }
 }
-
-final List<Album> albums = [
-  Album(
-    title: 'This is Lola Amour',
-    artist: 'Lola Amour',
-    assetPath: 'assets/covers/lolaamour.png',
-    songs: [
-      Song(
-        title: 'Raining In Manila',
-        artist: 'Lola Amour',
-        assetPath: 'assets/covers/rain.png',
-        mp3Path: 'assets/music/raining_in_manila.mp3', // Add MP3 path
-      ),
-      Song(
-        title: 'Fallen',
-        artist: 'Lola Amour',
-        assetPath: 'assets/covers/fallen.png',
-        mp3Path: 'assets/music/fallen.mp3', // Add MP3 path
-      ),
-      Song(
-        title: 'dahan-dahan',
-        artist: 'Lola Amour',
-        assetPath: 'assets/covers/dahan.png',
-        mp3Path: 'assets/music/dahan_dahan.mp3', // Add MP3 path
-      ),
-      Song(
-        title: 'Pwede Ba',
-        artist: 'Lola Amour',
-        assetPath: 'assets/covers/pwede.png',
-        mp3Path: 'assets/music/pwede_ba.mp3', // Add MP3 path
-      ),
-      Song(
-        title: 'Namimiss Ko Na',
-        artist: 'Lola Amour',
-        assetPath: 'assets/covers/miss.png',
-        mp3Path: 'assets/music/namimiss_ko_na.mp3', // Add MP3 path
-      ),
-      // Add more songs here
-    ],
-  ),
-  Album(
-    title: 'This is Adie',
-    artist: 'Adie',
-    assetPath: 'assets/covers/adie.png',
-    songs: [
-      Song(
-        title: 'Mahika',
-        artist: 'Adie',
-        assetPath: 'assets/covers/mahika.png',
-        mp3Path: 'assets/music/mahika.mp3', // Add MP3 path
-      ),
-      Song(
-        title: 'Tahanan',
-        artist: 'Adie',
-        assetPath: 'assets/covers/tahan.png',
-        mp3Path: 'assets/music/tahanan.mp3', // Add MP3 path
-      ),
-      Song(
-        title: 'Paraluman',
-        artist: 'Adie',
-        assetPath: 'assets/covers/paraluman.png',
-        mp3Path: 'assets/music/paraluman.mp3', // Add MP3 path
-      ),
-      Song(
-        title: 'Oh, Giliw',
-        artist: 'Adie',
-        assetPath: 'assets/covers/giliw.png',
-        mp3Path: 'assets/music/oh_giliw.mp3', // Add MP3 path
-      ),
-      Song(
-        title: 'Kursunada',
-        artist: 'Adie',
-        assetPath: 'assets/covers/kursunada.png',
-        mp3Path: 'assets/music/kursunada.mp3', // Add MP3 path
-      ),
-      // Add more songs here
-    ],
-  ),
-  Album(
-    title: 'This is The 1975',
-    artist: 'The 1975',
-    assetPath: 'assets/covers/The 1975.jpeg',
-    songs: [
-      Song(
-        title: 'About You',
-        artist: 'The 1975',
-        assetPath: 'assets/covers/About you.jpeg',
-        mp3Path: 'assets/music/about_you.mp3', // Add MP3 path
-      ),
-      Song(
-        title: 'Somebody Else',
-        artist: 'The 1975',
-        assetPath: 'assets/covers/Somebody Else.jpeg',
-        mp3Path: 'assets/music/somebody_else.mp3', // Add MP3 path
-      ),
-      Song(
-        title: 'Robbers',
-        artist: 'The 1975',
-        assetPath: 'assets/covers/Robbers.jpeg',
-        mp3Path: 'assets/music/robbers.mp3', // Add MP3 path
-      ),
-      Song(
-        title: 'Its Not Living If Its Not With You',
-        artist: 'The 1975',
-        assetPath: 'assets/covers/ItsNotLivingIfItsNotWithYou.jpeg',
-        mp3Path: 'assets/music/its_not_living.mp3', // Add MP3 path
-      ),
-      Song(
-        title: 'Chocolate',
-        artist: 'The 1975',
-        assetPath: 'assets/covers/Chocolate.jpeg',
-        mp3Path: 'assets/music/chocolate.mp3', // Add MP3 path
-      ),
-      // Add more songs here
-    ],
-  ),
-  Album(
-    title: 'This is Taylor Swift',
-    artist: 'Taylor Swift',
-    assetPath: 'assets/covers/Taylor Swift.jpg',
-    songs: [
-      Song(
-        title: 'Fortnight (feat. Post Malone',
-        artist: 'Taylor Swift',
-        assetPath: 'assets/covers/Fortnight feat. Post Malone.jpeg',
-        mp3Path: 'assets/music/fortnight_feat_post_malone.mp3', // Add MP3 path
-      ),
-      Song(
-        title: 'Cruel Summer',
-        artist: 'Taylor Swift',
-        assetPath: 'assets/covers/Cruel Summer.jpeg',
-        mp3Path: 'assets/music/cruel_summer.mp3', // Add MP3 path
-      ),
-      Song(
-        title: 'I Can Do It With a Broken Heart',
-        artist: 'Taylor Swift',
-        assetPath: 'assets/covers/ICanDoItWithaBrokenHeart.jpeg',
-        mp3Path:
-            'assets/music/i_can_do_it_with_a_broken_heart.mp3', // Add MP3 path
-      ),
-      Song(
-        title: 'Down Bad',
-        artist: 'Taylor Swift',
-        assetPath: 'assets/covers/Down Bad.jpeg',
-        mp3Path: 'assets/music/down_bad.mp3', // Add MP3 path
-      ),
-      Song(
-        title: 'Guilty as Sin?',
-        artist: 'Taylor Swift',
-        assetPath: 'assets/covers/Guilty as Sin.jpeg',
-        mp3Path: 'assets/music/guilty_as_sin.mp3', // Add MP3 path
-      ),
-      // Add more songs here
-    ],
-  ),
-  // Add more albums here
-];

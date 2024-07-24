@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'widget.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:provider/provider.dart';
+import '../widget.dart'; // Import your Song class
 
 class MiniMediaPlayer extends StatelessWidget {
   final Song song;
@@ -21,11 +21,6 @@ class MiniMediaPlayer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final favoritesNotifier = Provider.of<FavoritesNotifier>(context);
-    final Song? song = favoritesNotifier.currentSong;
-
-    if (song == null) {
-      return SizedBox.shrink();
-    }
 
     return Padding(
       padding: const EdgeInsets.all(8.0),
@@ -37,13 +32,16 @@ class MiniMediaPlayer extends StatelessWidget {
         height: 60,
         child: Row(
           children: <Widget>[
-            ClipRRect(
-              borderRadius: BorderRadius.circular(3.0),
-              child: Image.asset(
-                song.assetPath,
-                width: 70.0,
-                height: 60.0,
-                fit: BoxFit.cover,
+            GestureDetector(
+              onTap: onTap,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(3.0),
+                child: Image.asset(
+                  song.assetPath,
+                  width: 70.0,
+                  height: 60.0,
+                  fit: BoxFit.cover,
+                ),
               ),
             ),
             SizedBox(width: 8.0),
@@ -80,13 +78,7 @@ class MiniMediaPlayer extends StatelessWidget {
                     ? Colors.redAccent
                     : Colors.white,
               ),
-              onPressed: () {
-                if (favoritesNotifier.isFavorite(song)) {
-                  favoritesNotifier.removeSong(song);
-                } else {
-                  favoritesNotifier.addSong(song);
-                }
-              },
+              onPressed: onFavoriteTap,
             ),
             SizedBox(width: 8.0),
             IconButton(

@@ -45,3 +45,28 @@ class FavoriteService {
 //     _player.dispose();
 //   }
 // }
+
+class PreferenceService {
+  static const String _currentSongKey = 'currentSong';
+  static const String _isPlayingKey = 'isPlaying';
+
+  Future<void> saveCurrentSong(String songJson) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_currentSongKey, songJson);
+  }
+
+  Future<String?> loadCurrentSong() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString(_currentSongKey);
+  }
+
+  Future<void> saveIsPlaying(bool isPlaying) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(_isPlayingKey, isPlaying);
+  }
+
+  Future<bool> loadIsPlaying() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getBool(_isPlayingKey) ?? false;
+  }
+}

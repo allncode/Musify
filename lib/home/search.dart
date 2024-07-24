@@ -54,6 +54,7 @@ class _SearchScreenState extends State<SearchScreen> {
     final favoritesNotifier =
         Provider.of<FavoritesNotifier>(context, listen: false);
     favoritesNotifier.setCurrentSong(song);
+    Navigator.pop(context); // Close the search screen
   }
 
   @override
