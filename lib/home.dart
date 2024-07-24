@@ -45,7 +45,7 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
         centerTitle: true,
         automaticallyImplyLeading: false,
-        backgroundColor: Color(0xFF222831),
+        backgroundColor: Color(0xff694F8E),
         elevation: 0.0,
       ),
       drawer: Drawer(

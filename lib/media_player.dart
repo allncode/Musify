@@ -1,68 +1,97 @@
 import 'package:flutter/material.dart';
-import 'widget.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:provider/provider.dart';
+import 'widget.dart'; // Import your provider file
 
 class MiniMediaPlayer extends StatelessWidget {
   final Song song;
   final VoidCallback onTap;
   final VoidCallback onMoreOptionsTap;
   final VoidCallback onFavoriteTap;
+  final VoidCallback onPlayPauseTap;
+  final bool isFavorite;
 
-  const MiniMediaPlayer({
-    Key? key,
+  MiniMediaPlayer({
     required this.song,
     required this.onTap,
     required this.onMoreOptionsTap,
     required this.onFavoriteTap,
-  }) : super(key: key);
+    required this.onPlayPauseTap,
+    required this.isFavorite,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.all(8.0),
-      decoration: BoxDecoration(
-        color: Colors.grey[900],
-        borderRadius: BorderRadius.vertical(top: Radius.circular(16.0)),
-      ),
-      child: Row(
-        children: [
-          // Your existing widgets for song display
-          Expanded(
-            child: ListTile(
-              contentPadding: EdgeInsets.zero,
-              leading: ClipRRect(
-                borderRadius: BorderRadius.circular(8.0),
-                child: Image.asset(
-                  song.assetPath,
-                  height: 50.0,
-                  width: 50.0,
-                  fit: BoxFit.cover,
-                ),
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.all(Radius.circular(5.0)),
+          color: Colors.grey[900],
+        ),
+        height: 80,
+        child: Row(
+          children: <Widget>[
+            // Song Image
+            ClipRRect(
+              borderRadius: BorderRadius.circular(3.0),
+              child: Image.asset(
+                song.assetPath,
+                width: 70.0,
+                height: 80.0,
+                fit: BoxFit.cover,
               ),
-              title: Text(
-                song.title,
-                style: TextStyle(color: Colors.white),
-              ),
-              subtitle: Text(
-                song.artist,
-                style: TextStyle(color: Colors.grey),
-              ),
-              onTap: onTap,
             ),
-          ),
-          IconButton(
-            icon: Icon(
-              Favorites.isFavorite(song)
-                  ? Icons.favorite
-                  : Icons.favorite_border,
-              color: Colors.redAccent,
+            SizedBox(width: 8.0),
+            // Song Details
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    song.title,
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14.0,
+                    ),
+                  ),
+                  Text(
+                    song.artist,
+                    style: TextStyle(
+                      color: Colors.grey,
+                      fontSize: 12.0,
+                    ),
+                  ),
+                ],
+              ),
             ),
-            onPressed: onFavoriteTap,
-          ),
-          IconButton(
-            icon: Icon(Icons.more_vert, color: Colors.white),
-            onPressed: onMoreOptionsTap,
-          ),
-        ],
+            // Controls
+            IconButton(
+              icon: FaIcon(
+                isFavorite
+                    ? FontAwesomeIcons.solidHeart
+                    : FontAwesomeIcons.heart,
+                color: isFavorite ? Color(0xff694F8E) : Colors.white,
+                size: 24.0,
+              ),
+              onPressed: onFavoriteTap,
+            ),
+            IconButton(
+              icon: FaIcon(FontAwesomeIcons.play),
+              onPressed: onPlayPauseTap,
+              color: Colors.white,
+              iconSize: 24.0,
+            ),
+            IconButton(
+              icon: FaIcon(FontAwesomeIcons.ellipsisV),
+              onPressed: onMoreOptionsTap,
+              color: Colors.white,
+              iconSize: 24.0,
+            ),
+          ],
+        ),
       ),
     );
   }

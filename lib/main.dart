@@ -5,13 +5,20 @@ import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:provider/provider.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  runApp(const MyApp());
+  runApp(
+    ChangeNotifierProvider(
+      create: (context) => FavoritesProvider(),
+      child: MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -48,7 +55,8 @@ class _MySpotifyState extends State<MySpotify> {
   final PageController _pageController = PageController();
   List<Map<String, String>> recentlyViewed = [];
   Song? _currentSong;
-  List<Song> recentlyPlayed = []; // Add this line
+  List<Song> recentlyPlayed = [];
+  bool _isPlaying = false;
 
   void _addToRecentlyViewed(String title, String artist, String assetPath) {
     setState(() {
@@ -106,6 +114,12 @@ class _MySpotifyState extends State<MySpotify> {
     }
   }
 
+  void _handlePlayPauseTap() {
+    setState(() {
+      _isPlaying = !_isPlaying;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -134,13 +148,16 @@ class _MySpotifyState extends State<MySpotify> {
                     song: _currentSong!,
                     onTap: () {
                       // Handle the play button tap
-                      // You could implement navigation to a detailed player screen here
+                      // Implement navigation to a detailed player screen or other actions
                     },
                     onMoreOptionsTap: () {
                       // Handle the three-dots icon tap
                       // Show more options or a menu here
                     },
                     onFavoriteTap: _handleFavoriteTap,
+                    onPlayPauseTap: _handlePlayPauseTap,
+                    isFavorite: Favorites.isFavorite(
+                        _currentSong!), // Correctly set favorite status
                   )
                 : SizedBox.shrink(),
           )
@@ -148,7 +165,7 @@ class _MySpotifyState extends State<MySpotify> {
       ),
       bottomNavigationBar: BottomNavigationBar(
         backgroundColor: Colors.black,
-        selectedItemColor: Colors.white,
+        selectedItemColor: Color(0xff694F8E),
         unselectedItemColor: Colors.grey,
         currentIndex: _currentIndex,
         items: [
@@ -193,7 +210,7 @@ class _MySpotifyState extends State<MySpotify> {
               physics: NeverScrollableScrollPhysics(),
               children: <Widget>[
                 _buildSongCard(context, 'Liked Songs', Icons.favorite,
-                    Colors.purple, LikedSongs()),
+                    Color(0xff694F8E), LikedSongs()),
               ],
             ),
             SizedBox(height: 16.0),
@@ -218,7 +235,7 @@ class _MySpotifyState extends State<MySpotify> {
             ),
             SizedBox(height: 8.0),
             Container(
-              height: 150.0,
+              height: 180.0,
               child: ListView(
                 scrollDirection: Axis.horizontal,
                 children: _getAllSongsFromAlbums().map((song) {
@@ -241,7 +258,7 @@ class _MySpotifyState extends State<MySpotify> {
               ),
               SizedBox(height: 8.0),
               Container(
-                height: 150.0,
+                height: 180.0,
                 child: ListView(
                   scrollDirection: Axis.horizontal,
                   children: recentlyPlayed.reversed.map((song) {
@@ -309,7 +326,7 @@ class _MySpotifyState extends State<MySpotify> {
                   }).toList(),
                 ),
               ),
-              SizedBox(height: 30.0),
+              SizedBox(height: 100.0),
             ],
           ],
         ),
@@ -327,6 +344,7 @@ class _MySpotifyState extends State<MySpotify> {
       },
       child: Container(
         width: 120.0,
+        height: 200.0,
         margin: EdgeInsets.only(right: 8.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -343,8 +361,10 @@ class _MySpotifyState extends State<MySpotify> {
             SizedBox(height: 8.0),
             Text(
               song.title,
-              style:
-                  TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+              style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 12.0),
             ),
             Text(
               song.artist,
@@ -361,10 +381,14 @@ class _MySpotifyState extends State<MySpotify> {
     return Card(
       color: Colors.grey[900],
       margin: EdgeInsets.all(8.0),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(5.0),
+      ),
       child: Container(
-        width: 150.0,
-        height: 150.0,
+        padding: EdgeInsets.symmetric(horizontal: 12.0),
+        height: 60.0,
         child: ListTile(
+          contentPadding: EdgeInsets.zero,
           leading: Icon(icon, color: iconColor, size: 30.0),
           title: Text(
             title,
@@ -376,7 +400,7 @@ class _MySpotifyState extends State<MySpotify> {
               MaterialPageRoute(
                 builder: (context) => screen,
                 settings: RouteSettings(
-                  arguments: albums, // Pass the list of albums here
+                  arguments: albums,
                 ),
               ),
             );
@@ -386,20 +410,24 @@ class _MySpotifyState extends State<MySpotify> {
     );
   }
 
+  void _handleAlbumTap(Album album) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => AlbumDetailScreen(
+          title: album.title,
+          artist: album.artist,
+          assetPath: album.assetPath,
+          songs: album.songs, // Pass the list of songs here
+        ),
+      ),
+    );
+  }
+
   Widget _buildAlbumCard(Album album) {
     return GestureDetector(
       onTap: () {
         _addToRecentlyViewed(album.title, album.artist, album.assetPath);
-        Navigator.of(context).push(
-          MaterialPageRoute(
-            builder: (context) => AlbumDetailScreen(
-              title: album.title,
-              artist: album.artist,
-              assetPath: album.assetPath,
-              songs: album.songs,
-            ),
-          ),
-        );
+        _handleAlbumTap(album); // Updated navigation method
       },
       child: Container(
         width: 150.0,
@@ -418,25 +446,11 @@ class _MySpotifyState extends State<MySpotify> {
             Positioned(
               bottom: 8.0,
               right: 1.0,
-              child: PopupMenuButton<String>(
+              child: IconButton(
                 icon: Icon(Icons.more_vert, color: Colors.white),
-                onSelected: (value) {
-                  _handleMenuSelection(value, album);
+                onPressed: () {
+                  _showBottomSheet(context, album);
                 },
-                itemBuilder: (context) => [
-                  PopupMenuItem<String>(
-                    value: 'Option1',
-                    child: Text('Option 1'),
-                  ),
-                  PopupMenuItem<String>(
-                    value: 'Option2',
-                    child: Text('Option 2'),
-                  ),
-                  PopupMenuItem<String>(
-                    value: 'Option3',
-                    child: Text('Option 3'),
-                  ),
-                ],
               ),
             ),
             Positioned(
@@ -466,6 +480,42 @@ class _MySpotifyState extends State<MySpotify> {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  void _showBottomSheet(BuildContext context, Album album) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.black87,
+      builder: (context) => Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          ListTile(
+            leading: FaIcon(FontAwesomeIcons.heart, color: Colors.white),
+            title: Text('Option 1', style: TextStyle(color: Colors.white)),
+            onTap: () {
+              Navigator.pop(context);
+              _handleMenuSelection('Option1', album);
+            },
+          ),
+          ListTile(
+            leading: FaIcon(FontAwesomeIcons.circleInfo, color: Colors.white),
+            title: Text('Option 2', style: TextStyle(color: Colors.white)),
+            onTap: () {
+              Navigator.pop(context);
+              _handleMenuSelection('Option2', album);
+            },
+          ),
+          ListTile(
+            leading: FaIcon(FontAwesomeIcons.circlePlus, color: Colors.white),
+            title: Text('Option 3', style: TextStyle(color: Colors.white)),
+            onTap: () {
+              Navigator.pop(context);
+              _handleMenuSelection('Option3', album);
+            },
+          ),
+        ],
       ),
     );
   }
@@ -542,6 +592,62 @@ final List<Album> albums = [
           title: 'Kursunada',
           artist: 'Adie',
           assetPath: 'assets/covers/kursunada.png'),
+      // Add more songs here
+    ],
+  ),
+  Album(
+    title: 'This is The 1975',
+    artist: 'The 1975',
+    assetPath: 'assets/covers/The 1975.jpeg',
+    songs: [
+      Song(
+          title: 'About You',
+          artist: 'The 1975',
+          assetPath: 'assets/covers/About you.jpeg'),
+      Song(
+          title: 'Somebody Else',
+          artist: 'The 1975',
+          assetPath: 'assets/covers/Somebody Else.jpeg'),
+      Song(
+          title: 'Robbers',
+          artist: 'The 1975',
+          assetPath: 'assets/covers/Robbers.jpeg'),
+      Song(
+          title: 'Its Not Living If Its Not With You',
+          artist: 'The 1975',
+          assetPath: 'assets/covers/ItsNotLivingIfItsNotWithYou.jpeg'),
+      Song(
+          title: 'Chocolate',
+          artist: 'The 1975',
+          assetPath: 'assets/covers/Chocolate.jpeg'),
+      // Add more songs here
+    ],
+  ),
+  Album(
+    title: 'This is Taylor Swift',
+    artist: 'Taylor Swift',
+    assetPath: 'assets/covers/Taylor Swift.jpg',
+    songs: [
+      Song(
+          title: 'Fortnight (feat. Post Malone',
+          artist: 'Taylor Swift',
+          assetPath: 'assets/covers/Fortnight feat. Post Malone.jpeg'),
+      Song(
+          title: 'Cruel Summer',
+          artist: 'Taylor Swift',
+          assetPath: 'assets/covers/Cruel Summer.jpeg'),
+      Song(
+          title: 'I Can Do It With a Broken Heart',
+          artist: 'Taylor Swift',
+          assetPath: 'assets/covers/ICanDoItWithaBrokenHeart.jpeg'),
+      Song(
+          title: 'Down Bad',
+          artist: 'Taylor Swift',
+          assetPath: 'assets/covers/Down Bad.jpeg'),
+      Song(
+          title: 'Guilty as Sin?',
+          artist: 'Taylor Swift',
+          assetPath: 'assets/covers/Guilty as Sin.jpeg'),
       // Add more songs here
     ],
   ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import '../widget.dart'; // Adjust the import according to your file structure
+import 'package:provider/provider.dart';
+import '../widget.dart';
 
 class SearchScreen extends StatefulWidget {
   @override
@@ -49,33 +50,10 @@ class _SearchScreenState extends State<SearchScreen> {
     });
   }
 
-  void _handleSongTap(Song song) {
-    setState(() {
-      _currentSong = song;
-    });
-    Positioned(
-      bottom: 0,
-      left: 0,
-      right: 0,
-      child: _currentSong != null
-          ? MiniMediaPlayer(
-              song: _currentSong!,
-              onTap: () {
-                // Handle the play button tap
-                // You could implement navigation to a detailed player screen here
-              },
-              onMoreOptionsTap: () {
-                // Handle the three-dots icon tap
-                // Show more options or a menu here
-              },
-              onFavoriteTap: () {},
-            )
-          : SizedBox.shrink(),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
+    final favoritesProvider = Provider.of<FavoritesProvider>(context);
+
     return Scaffold(
       backgroundColor: Colors.black87,
       body: Padding(
@@ -108,12 +86,20 @@ class _SearchScreenState extends State<SearchScreen> {
                 children: _filteredResults.map((result) {
                   if (result is Song) {
                     return _buildSearchResultCard(
-                        result.title, result.artist, result.assetPath,
-                        isSong: true);
+                      title: result.title,
+                      artist: result.artist,
+                      assetPath: result.assetPath,
+                      isSong: true,
+                      song: result,
+                      favoritesProvider: favoritesProvider,
+                    );
                   } else if (result is Album) {
                     return _buildSearchResultCard(
-                        result.title, result.artist, result.assetPath,
-                        isSong: false);
+                      title: result.title,
+                      artist: result.artist,
+                      assetPath: result.assetPath,
+                      isSong: false,
+                    );
                   } else {
                     return SizedBox.shrink(); // Handle unexpected cases
                   }
@@ -126,10 +112,17 @@ class _SearchScreenState extends State<SearchScreen> {
     );
   }
 
-  Widget _buildSearchResultCard(String title, String artist, String assetPath,
-      {required bool isSong}) {
+  Widget _buildSearchResultCard({
+    required String title,
+    required String artist,
+    required String assetPath,
+    required bool isSong,
+    Song? song,
+    FavoritesProvider? favoritesProvider,
+  }) {
     return Card(
       color: Colors.grey[900],
+      margin: EdgeInsets.symmetric(vertical: 8.0),
       child: ListTile(
         leading: CircleAvatar(
           backgroundImage: AssetImage(assetPath),
@@ -143,13 +136,26 @@ class _SearchScreenState extends State<SearchScreen> {
           artist,
           style: TextStyle(color: Colors.grey),
         ),
+        trailing: isSong
+            ? IconButton(
+                icon: Icon(
+                  favoritesProvider != null &&
+                          favoritesProvider.isFavorite(song!)
+                      ? Icons.favorite
+                      : Icons.favorite_border,
+                  color: Colors.red,
+                ),
+                onPressed: () {
+                  if (song != null) {
+                    favoritesProvider?.toggleFavorite(song);
+                  }
+                },
+              )
+            : null,
         onTap: () {
-          if (isSong) {
-            final song = _allSongs.firstWhere(
-              (song) => song.title == title && song.artist == artist,
-            );
-            _handleSongTap(song);
-          } else {
+          if (isSong && song != null) {
+            _showMiniMediaPlayer(context, song);
+          } else if (!isSong) {
             Navigator.of(context).push(
               MaterialPageRoute(
                 builder: (context) => AlbumDetailScreen(
@@ -165,6 +171,32 @@ class _SearchScreenState extends State<SearchScreen> {
           }
         },
       ),
+    );
+  }
+
+  void _showMiniMediaPlayer(BuildContext context, Song song) {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) {
+        return MiniMediaPlayer(
+          song: song,
+          onTap: () {
+            // Handle song tap in MiniMediaPlayer
+          },
+          onMoreOptionsTap: () {
+            // Handle more options tap
+          },
+          onPlayPauseTap: () {
+            // Handle play/pause
+          },
+          onFavoriteTap: () {
+            final favoritesProvider =
+                Provider.of<FavoritesProvider>(context, listen: false);
+            favoritesProvider.toggleFavorite(song);
+          },
+          isFavorite: Provider.of<FavoritesProvider>(context).isFavorite(song),
+        );
+      },
     );
   }
 }
