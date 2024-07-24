@@ -63,9 +63,9 @@ class _MySpotifyState extends State<MySpotify> {
     GlobalKey<NavigatorState>(),
   ];
   final PageController _pageController = PageController();
-  List<Map<String, String>> recentlyViewed = [];
+  List<dynamic> recentlyViewed = [];
   Song? _currentSong;
-  List<Song> recentlyPlayed = [];
+  List<dynamic> recentlyPlayed = [];
   bool _isPlaying = false;
 
   void _onItemTapped(int index) {
@@ -109,7 +109,7 @@ class _MySpotifyState extends State<MySpotify> {
 
   void _addToRecentlyPlayed(Song song) {
     setState(() {
-      if (!recentlyPlayed.contains(song)) {
+      if (!recentlyPlayed.any((s) => s == song)) {
         recentlyPlayed.add(song);
         if (recentlyPlayed.length > 5) {
           recentlyPlayed.removeAt(0);
@@ -169,6 +169,24 @@ class _MySpotifyState extends State<MySpotify> {
         );
   }
 
+////////////////////////////////////////////////////////////////////////////
+  Future<void> saveCurrentSong(Song song) async {
+    final prefs = await SharedPreferences.getInstance();
+    final songJson = jsonEncode(song.toJson());
+    await prefs.setString('currentSong', songJson);
+  }
+
+  Future<Song?> loadCurrentSong() async {
+    final prefs = await SharedPreferences.getInstance();
+    final songJson = prefs.getString('currentSong');
+    if (songJson != null) {
+      final songMap = jsonDecode(songJson);
+      return Song.fromJson(songMap);
+    }
+    return null;
+  }
+
+////////////////////////////////////////////////////////////////////////////
   Future<void> _saveRecentlyViewed() async {
     final prefs = await SharedPreferences.getInstance();
     final viewedList = recentlyViewed.map((entry) => entry.toString()).toList();
@@ -186,9 +204,14 @@ class _MySpotifyState extends State<MySpotify> {
     final prefs = await SharedPreferences.getInstance();
     final viewedList = prefs.getStringList('recentlyViewed') ?? [];
     setState(() {
-      recentlyPlayed = viewedList
-          .map((songJson) => Song.fromJson(jsonDecode(songJson)))
-          .toList();
+      recentlyViewed = viewedList.map((entryJson) {
+        final entryMap = jsonDecode(entryJson) as Map<String, dynamic>;
+        if (entryMap.containsKey('songs')) {
+          return Album.fromJson(entryMap);
+        } else {
+          return Song.fromJson(entryMap);
+        }
+      }).toList();
     });
   }
 
