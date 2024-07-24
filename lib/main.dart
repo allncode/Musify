@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:myapp/splash_screen.dart';
@@ -8,6 +10,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -99,11 +102,12 @@ class _MySpotifyState extends State<MySpotify> {
       if (recentlyViewed.length > 5) {
         recentlyViewed.removeAt(0);
       }
+
+      _saveRecentlyViewed(); // Save to SharedPreferences
     });
   }
 
   void _addToRecentlyPlayed(Song song) {
-    // Add this method
     setState(() {
       if (!recentlyPlayed.contains(song)) {
         recentlyPlayed.add(song);
@@ -111,6 +115,8 @@ class _MySpotifyState extends State<MySpotify> {
           recentlyPlayed.removeAt(0);
         }
       }
+
+      _saveRecentlyPlayed(); // Save to SharedPreferences
     });
   }
 
@@ -163,6 +169,47 @@ class _MySpotifyState extends State<MySpotify> {
         );
   }
 
+  Future<void> _saveRecentlyViewed() async {
+    final prefs = await SharedPreferences.getInstance();
+    final viewedList = recentlyViewed.map((entry) => entry.toString()).toList();
+    await prefs.setStringList('recentlyViewed', viewedList);
+  }
+
+  Future<void> _saveRecentlyPlayed() async {
+    final prefs = await SharedPreferences.getInstance();
+    final playedList =
+        recentlyPlayed.map((song) => jsonEncode(song.toJson())).toList();
+    await prefs.setStringList('recentlyPlayed', playedList);
+  }
+
+  Future<void> _loadRecentlyViewed() async {
+    final prefs = await SharedPreferences.getInstance();
+    final viewedList = prefs.getStringList('recentlyViewed') ?? [];
+    setState(() {
+      recentlyPlayed = viewedList
+          .map((songJson) => Song.fromJson(jsonDecode(songJson)))
+          .toList();
+    });
+  }
+
+  Future<void> _loadRecentlyPlayed() async {
+    final prefs = await SharedPreferences.getInstance();
+    final playedList = prefs.getStringList('recentlyPlayed') ?? [];
+    setState(() {
+      recentlyPlayed = playedList
+          .map((songJson) => Song.fromJson(jsonDecode(songJson)))
+          .toList();
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _loadRecentlyViewed();
+    _loadRecentlyPlayed();
+  }
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -474,16 +521,17 @@ class _MySpotifyState extends State<MySpotify> {
   }
 
   void _handleAlbumTap(Album album) {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => AlbumDetailScreen(
-          title: album.title,
-          artist: album.artist,
-          assetPath: album.assetPath,
-          songs: album.songs,
-        ),
-      ),
-    );
+    // Use the correct Navigator key for the selected page
+    _navigatorKeys[_selectedIndex].currentState?.push(
+          MaterialPageRoute(
+            builder: (context) => AlbumDetailScreen(
+              title: album.title,
+              artist: album.artist,
+              assetPath: album.assetPath,
+              songs: album.songs,
+            ),
+          ),
+        );
   }
 
   Widget _buildAlbumCard(Album album) {

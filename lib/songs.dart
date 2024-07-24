@@ -22,23 +22,16 @@ class Song {
   final String title;
   final String artist;
   final String assetPath;
-  final String mp3Path; // New field for MP3 file path
+  final String mp3Path;
 
   Song({
     required this.title,
     required this.artist,
     required this.assetPath,
-    required this.mp3Path, // Initialize new field
+    required this.mp3Path,
   });
-  factory Song.fromJson(Map<String, dynamic> json) {
-    return Song(
-      title: json['title'],
-      artist: json['artist'],
-      assetPath: json['assetPath'],
-      mp3Path: json['mp3Path'],
-    );
-  }
 
+  // Convert Song to JSON
   Map<String, dynamic> toJson() {
     return {
       'title': title,
@@ -46,6 +39,16 @@ class Song {
       'assetPath': assetPath,
       'mp3Path': mp3Path,
     };
+  }
+
+  // Create Song from JSON
+  factory Song.fromJson(Map<String, dynamic> json) {
+    return Song(
+      title: json['title'],
+      artist: json['artist'],
+      assetPath: json['assetPath'],
+      mp3Path: json['mp3Path'],
+    );
   }
 }
 
@@ -61,6 +64,28 @@ class Album {
     required this.assetPath,
     required this.songs,
   });
+
+  // Convert Album to JSON
+  Map<String, dynamic> toJson() {
+    return {
+      'title': title,
+      'artist': artist,
+      'assetPath': assetPath,
+      'songs': songs.map((song) => song.toJson()).toList(),
+    };
+  }
+
+  // Create Album from JSON
+  factory Album.fromJson(Map<String, dynamic> json) {
+    return Album(
+      title: json['title'],
+      artist: json['artist'],
+      assetPath: json['assetPath'],
+      songs: (json['songs'] as List)
+          .map((songJson) => Song.fromJson(songJson))
+          .toList(),
+    );
+  }
 }
 
 final List<Album> albums = [
