@@ -19,7 +19,7 @@ Future<void> main() async {
   );
   runApp(
     ChangeNotifierProvider(
-      create: (context) => FavoritesNotifier(),
+      create: (_) => FavoritesNotifier(),
       child: MyApp(),
     ),
   );
@@ -30,20 +30,23 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Color(0xffB692C2)),
-        useMaterial3: true,
-        textTheme: GoogleFonts.poppinsTextTheme(Theme.of(context).textTheme),
+    return ChangeNotifierProvider(
+      create: (context) => FavoritesNotifier(),
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        title: 'Flutter Demo',
+        theme: ThemeData(
+          colorScheme: ColorScheme.fromSeed(seedColor: Color(0xffB692C2)),
+          useMaterial3: true,
+          textTheme: GoogleFonts.poppinsTextTheme(Theme.of(context).textTheme),
+        ),
+        home: const MySplashScreen(),
+        routes: {
+          '/search': (context) => SearchScreen(),
+          '/your_library': (context) => MyLibrary(),
+          '/likesSongs': (context) => LikedSongs(),
+        },
       ),
-      home: const MySplashScreen(),
-      routes: {
-        '/search': (context) => SearchScreen(),
-        '/your_library': (context) => YourLibrary(),
-        '/likesSongs': (context) => LikedSongs(),
-      },
     );
   }
 }
@@ -170,39 +173,35 @@ class _MySpotifyState extends State<MySpotify> {
   }
 
 ////////////////////////////////////////////////////////////////////////////
-  Future<void> saveCurrentSong(Song song) async {
-    final prefs = await SharedPreferences.getInstance();
-    final songJson = jsonEncode(song.toJson());
-    await prefs.setString('currentSong', songJson);
-  }
+  // Future<void> saveCurrentSong(Song song) async {
+  //   final prefs = await SharedPreferences.getInstance();
+  //   final songJson = jsonEncode(song.toJson());
+  //   await prefs.setString('currentSong', songJson);
+  // }
 
-  Future<Song?> loadCurrentSong() async {
-    final prefs = await SharedPreferences.getInstance();
-    final songJson = prefs.getString('currentSong');
-    if (songJson != null) {
-      final songMap = jsonDecode(songJson);
-      return Song.fromJson(songMap);
-    }
-    return null;
-  }
+  // Future<Song?> loadCurrentSong() async {
+  //   final prefs = await SharedPreferences.getInstance();
+  //   final songJson = prefs.getString('currentSong');
+  //   if (songJson != null) {
+  //     final songMap = jsonDecode(songJson);
+  //     return Song.fromJson(songMap);
+  //   }
+  //   return null;
+  // }
 
 ////////////////////////////////////////////////////////////////////////////
   Future<void> _saveRecentlyViewed() async {
     final prefs = await SharedPreferences.getInstance();
-    final viewedList = recentlyViewed.map((entry) => entry.toString()).toList();
+    final viewedList =
+        recentlyViewed.map((entry) => jsonEncode(entry.toJson())).toList();
     await prefs.setStringList('recentlyViewed', viewedList);
-  }
-
-  Future<void> _saveRecentlyPlayed() async {
-    final prefs = await SharedPreferences.getInstance();
-    final playedList =
-        recentlyPlayed.map((song) => jsonEncode(song.toJson())).toList();
-    await prefs.setStringList('recentlyPlayed', playedList);
+    print('Saved Recently Viewed: $viewedList');
   }
 
   Future<void> _loadRecentlyViewed() async {
     final prefs = await SharedPreferences.getInstance();
     final viewedList = prefs.getStringList('recentlyViewed') ?? [];
+    print('Loaded Recently Viewed: $viewedList');
     setState(() {
       recentlyViewed = viewedList.map((entryJson) {
         final entryMap = jsonDecode(entryJson) as Map<String, dynamic>;
@@ -213,6 +212,13 @@ class _MySpotifyState extends State<MySpotify> {
         }
       }).toList();
     });
+  }
+
+  Future<void> _saveRecentlyPlayed() async {
+    final prefs = await SharedPreferences.getInstance();
+    final playedList =
+        recentlyPlayed.map((song) => jsonEncode(song.toJson())).toList();
+    await prefs.setStringList('recentlyPlayed', playedList);
   }
 
   Future<void> _loadRecentlyPlayed() async {
@@ -233,6 +239,7 @@ class _MySpotifyState extends State<MySpotify> {
   }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -267,7 +274,7 @@ class _MySpotifyState extends State<MySpotify> {
                 key: _navigatorKeys[2],
                 onGenerateRoute: (routeSettings) {
                   return MaterialPageRoute(
-                    builder: (context) => YourLibrary(),
+                    builder: (context) => MyLibrary(),
                   );
                 },
               ),
@@ -621,51 +628,5 @@ class _MySpotifyState extends State<MySpotify> {
         ),
       ),
     );
-  }
-
-  void _showBottomSheet(BuildContext context, Album album) {
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.black87,
-      builder: (context) => Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          ListTile(
-            leading: FaIcon(FontAwesomeIcons.circlePlus, color: Colors.white),
-            title:
-                Text('Add to Library', style: TextStyle(color: Colors.white)),
-            onTap: () {
-              Navigator.pop(context);
-              _handleMenuSelection('Option2', album);
-            },
-          ),
-          ListTile(
-            leading: FaIcon(FontAwesomeIcons.circleInfo, color: Colors.white),
-            title: Text('Song Details', style: TextStyle(color: Colors.white)),
-            onTap: () {
-              Navigator.pop(context);
-              _handleMenuSelection('Option3', album);
-            },
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _handleMenuSelection(String value, Album album) {
-    switch (value) {
-      case 'Option1':
-        // Handle Option 1 action
-        break;
-      case 'Option2':
-        // Handle Option 2 action
-        break;
-      case 'Option3':
-        // Handle Option 3 action
-        break;
-      default:
-        // Handle default case
-        break;
-    }
   }
 }

@@ -97,38 +97,40 @@ class _AlbumDetailScreenState extends State<AlbumDetailScreen> {
                                   icon: Icon(Icons.more_vert,
                                       color: Colors.white),
                                   onPressed: () {
-                                    // Show options
-                                    showModalBottomSheet(
-                                      context: context,
-                                      builder: (context) {
-                                        return Column(
+                                    void _showSimpleBottomSheet(
+                                        BuildContext context) {
+                                      showModalBottomSheet(
+                                        context: context,
+                                        backgroundColor: Colors.black87,
+                                        builder: (context) => Column(
                                           mainAxisSize: MainAxisSize.min,
                                           children: [
                                             ListTile(
-                                              leading: Icon(Icons.add),
-                                              title: Text('Add to Playlist'),
+                                              leading: Icon(Icons.add,
+                                                  color: Colors.white),
+                                              title: Text('Add to Library',
+                                                  style: TextStyle(
+                                                      color: Colors.white)),
                                               onTap: () {
                                                 Navigator.pop(context);
+                                                // Your action here
                                               },
                                             ),
                                             ListTile(
-                                              leading: Icon(Icons.info),
-                                              title: Text('Song Info'),
+                                              leading: Icon(Icons.info,
+                                                  color: Colors.white),
+                                              title: Text('Song Details',
+                                                  style: TextStyle(
+                                                      color: Colors.white)),
                                               onTap: () {
                                                 Navigator.pop(context);
-                                              },
-                                            ),
-                                            ListTile(
-                                              leading: Icon(Icons.share),
-                                              title: Text('Share'),
-                                              onTap: () {
-                                                Navigator.pop(context);
+                                                // Your action here
                                               },
                                             ),
                                           ],
-                                        );
-                                      },
-                                    );
+                                        ),
+                                      );
+                                    }
                                   },
                                 ),
                               ],

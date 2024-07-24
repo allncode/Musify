@@ -105,7 +105,7 @@ final List<Album> albums = [
         title: 'Pantropiko',
         artist: 'BINI',
         assetPath: 'assets/covers/pantropiko.jpg',
-        mp3Path: 'assets/audio/pantropiko.mp3',
+        mp3Path: 'assets/audio/bini-pantropiko.mp3',
       ),
       Song(
         title: 'Karera',
@@ -144,7 +144,7 @@ final List<Album> albums = [
         title: 'sining (feat. Jay R)',
         artist: 'Dionela',
         assetPath: 'assets/covers/sining.jpg',
-        mp3Path: 'assets/audio/sining_feat_jay_r.mp3',
+        mp3Path: 'assets/audio/sining.mp3',
       ),
       Song(
         title: 'Hoodie (feat. Alisson Shore)',

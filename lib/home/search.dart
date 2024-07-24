@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../widget.dart'; // Adjust the import according to your file structure
+import '../widget.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class SearchScreen extends StatefulWidget {
   @override
@@ -17,8 +18,8 @@ class _SearchScreenState extends State<SearchScreen> {
   void initState() {
     super.initState();
     _allSongs = _getAllSongsFromAlbums();
-    _allAlbums = albums; // Get all albums from the main.dart
-    _filteredResults = _allSongs; // Initialize with all songs
+    _allAlbums = albums;
+    _filteredResults = _allSongs;
   }
 
   List<Song> _getAllSongsFromAlbums() {
@@ -53,8 +54,15 @@ class _SearchScreenState extends State<SearchScreen> {
   void _handleSongTap(Song song) {
     final favoritesNotifier =
         Provider.of<FavoritesNotifier>(context, listen: false);
+
     favoritesNotifier.setCurrentSong(song);
-    Navigator.pop(context); // Close the search screen
+    Song? _currentSong;
+    bool _isPlaying = false;
+
+    setState(() {
+      _currentSong = song;
+      _isPlaying = true;
+    });
   }
 
   @override
@@ -87,20 +95,27 @@ class _SearchScreenState extends State<SearchScreen> {
             ),
             SizedBox(height: 8.0),
             Expanded(
-              child: ListView(
-                children: _filteredResults.map((result) {
-                  if (result is Song) {
-                    return _buildSearchResultCard(
-                        result.title, result.artist, result.assetPath,
-                        isSong: true, song: result);
-                  } else if (result is Album) {
-                    return _buildSearchResultCard(
-                        result.title, result.artist, result.assetPath,
-                        isSong: false);
-                  } else {
-                    return SizedBox.shrink(); // Handle unexpected cases
-                  }
-                }).toList(),
+              child: Consumer<FavoritesNotifier>(
+                builder: (context, favoritesNotifier, child) {
+                  return ListView(
+                    children: _filteredResults.map((result) {
+                      if (result is Song) {
+                        return _buildSearchResultCard(
+                            result.title, result.artist, result.assetPath,
+                            isSong: true,
+                            song: result,
+                            favoritesNotifier: favoritesNotifier);
+                      } else if (result is Album) {
+                        return _buildSearchResultCard(
+                            result.title, result.artist, result.assetPath,
+                            isSong: false,
+                            favoritesNotifier: favoritesNotifier);
+                      } else {
+                        return SizedBox.shrink(); // Handle unexpected cases
+                      }
+                    }).toList(),
+                  );
+                },
               ),
             ),
           ],
@@ -110,7 +125,9 @@ class _SearchScreenState extends State<SearchScreen> {
   }
 
   Widget _buildSearchResultCard(String title, String artist, String assetPath,
-      {required bool isSong, Song? song}) {
+      {required bool isSong,
+      Song? song,
+      required FavoritesNotifier favoritesNotifier}) {
     return Card(
       color: Colors.grey[900],
       child: ListTile(
@@ -142,8 +159,18 @@ class _SearchScreenState extends State<SearchScreen> {
                     onPressed: () {
                       if (isFavorite) {
                         favoritesNotifier.removeSong(song!);
+                        Fluttertoast.showToast(
+                          msg: "Removed from favorites",
+                          backgroundColor: Colors.black,
+                          textColor: Colors.white,
+                        );
                       } else {
                         favoritesNotifier.addSong(song!);
+                        Fluttertoast.showToast(
+                          msg: "Added to favorites",
+                          backgroundColor: Colors.black,
+                          textColor: Colors.white,
+                        );
                       }
                     },
                   );
