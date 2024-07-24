@@ -20,6 +20,7 @@ class AlbumDetailScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
+          foregroundColor: Colors.white,
           title: Text(
             title,
             style: TextStyle(color: Colors.white),

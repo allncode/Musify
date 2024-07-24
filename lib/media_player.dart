@@ -4,7 +4,7 @@ import 'package:provider/provider.dart';
 import '../widget.dart'; // Import your Song class
 
 class MiniMediaPlayer extends StatelessWidget {
-  final Song song;
+  final Song? song;
   final VoidCallback onTap;
   final VoidCallback onMoreOptionsTap;
   final VoidCallback onFavoriteTap;
@@ -20,6 +20,10 @@ class MiniMediaPlayer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (song == null) {
+      return SizedBox.shrink(); // Return an empty widget if there's no song
+    }
+
     final favoritesNotifier = Provider.of<FavoritesNotifier>(context);
 
     return Padding(
@@ -37,7 +41,7 @@ class MiniMediaPlayer extends StatelessWidget {
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(3.0),
                 child: Image.asset(
-                  song.assetPath,
+                  song!.assetPath,
                   width: 70.0,
                   height: 60.0,
                   fit: BoxFit.cover,
@@ -51,7 +55,7 @@ class MiniMediaPlayer extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    song.title,
+                    song!.title,
                     style: TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.bold,
@@ -59,7 +63,7 @@ class MiniMediaPlayer extends StatelessWidget {
                     ),
                   ),
                   Text(
-                    song.artist,
+                    song!.artist,
                     style: TextStyle(
                       color: Colors.grey,
                       fontSize: 12.0,
@@ -71,10 +75,10 @@ class MiniMediaPlayer extends StatelessWidget {
             SizedBox(width: 8.0),
             IconButton(
               icon: FaIcon(
-                favoritesNotifier.isFavorite(song)
+                favoritesNotifier.isFavorite(song!)
                     ? FontAwesomeIcons.solidHeart
                     : FontAwesomeIcons.heart,
-                color: favoritesNotifier.isFavorite(song)
+                color: favoritesNotifier.isFavorite(song!)
                     ? Colors.redAccent
                     : Colors.white,
               ),

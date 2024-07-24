@@ -147,18 +147,15 @@ class _MySpotifyState extends State<MySpotify> {
     final favoritesNotifier =
         Provider.of<FavoritesNotifier>(context, listen: false);
 
-    // Update the currently playing song in FavoritesNotifier
     favoritesNotifier.setCurrentSong(song);
 
-    // Update the MiniMediaPlayer to reflect the new song
     setState(() {
       _currentSong = song;
-      _isPlaying = true; // Optional: Start playing the song immediately
+      _isPlaying = true;
     });
   }
 
   void _handleGridItemTap() {
-    // Navigate to the LikedSongs page within the current PageView's Navigator
     _navigatorKeys[_selectedIndex].currentState?.push(
           MaterialPageRoute(
             builder: (context) => LikedSongs(),
@@ -206,20 +203,6 @@ class _MySpotifyState extends State<MySpotify> {
               ),
             ],
           ),
-          Positioned(
-            bottom: 0,
-            left: 0,
-            right: 0,
-            child: _currentSong != null
-                ? MiniMediaPlayer(
-                    song: _currentSong!,
-                    onTap: () {},
-                    onMoreOptionsTap: () {},
-                    onFavoriteTap: _handleFavoriteTap,
-                    onPlayPauseTap: _handlePlayPauseTap,
-                  )
-                : SizedBox.shrink(),
-          ),
         ],
       ),
       bottomNavigationBar: BottomNavigationBar(
@@ -243,6 +226,19 @@ class _MySpotifyState extends State<MySpotify> {
         ],
         onTap: _onItemTapped,
       ),
+      persistentFooterButtons: [
+        Consumer<FavoritesNotifier>(
+          builder: (context, favoritesNotifier, child) {
+            return MiniMediaPlayer(
+              song: favoritesNotifier.currentSong,
+              onTap: () {},
+              onMoreOptionsTap: () {},
+              onFavoriteTap: _handleFavoriteTap,
+              onPlayPauseTap: _handlePlayPauseTap,
+            );
+          },
+        ),
+      ],
     );
   }
 
@@ -292,7 +288,7 @@ class _MySpotifyState extends State<MySpotify> {
                 }).toList(),
               ),
             ),
-            SizedBox(height: 16.0),
+            SizedBox(height: 30.0),
             Text(
               'Songs',
               style: TextStyle(color: Colors.white, fontSize: 18.0),
@@ -314,7 +310,7 @@ class _MySpotifyState extends State<MySpotify> {
                 }).toList(),
               ),
             ),
-            SizedBox(height: 8.0),
+            SizedBox(height: 30.0),
             if (recentlyViewed.isNotEmpty) ...[
               Text(
                 'Recently Viewed',
@@ -375,7 +371,7 @@ class _MySpotifyState extends State<MySpotify> {
                 ),
               ),
             ],
-            SizedBox(height: 16.0),
+            SizedBox(height: 30.0),
             if (recentlyPlayed.isNotEmpty) ...[
               Text(
                 'Recently Played Songs',
@@ -484,7 +480,7 @@ class _MySpotifyState extends State<MySpotify> {
           title: album.title,
           artist: album.artist,
           assetPath: album.assetPath,
-          songs: album.songs, // Pass the list of songs here
+          songs: album.songs,
         ),
       ),
     );
@@ -494,7 +490,7 @@ class _MySpotifyState extends State<MySpotify> {
     return GestureDetector(
       onTap: () {
         _addToRecentlyViewed(album.title, album.artist, album.assetPath);
-        _handleAlbumTap(album); // Updated navigation method
+        _handleAlbumTap(album);
       },
       child: Container(
         width: 150.0,
@@ -512,16 +508,6 @@ class _MySpotifyState extends State<MySpotify> {
             ),
             Positioned(
               bottom: 8.0,
-              right: 1.0,
-              child: IconButton(
-                icon: Icon(Icons.more_vert, color: Colors.black),
-                onPressed: () {
-                  _showBottomSheet(context, album);
-                },
-              ),
-            ),
-            Positioned(
-              bottom: 8.0,
               left: 8.0,
               right: 8.0,
               child: Column(
@@ -532,7 +518,7 @@ class _MySpotifyState extends State<MySpotify> {
                     style: TextStyle(
                       color: Colors.black,
                       fontWeight: FontWeight.bold,
-                      fontSize: 12.0,
+                      fontSize: 16.0,
                       shadows: [
                         Shadow(
                           color: Colors.white.withOpacity(1),
@@ -546,7 +532,7 @@ class _MySpotifyState extends State<MySpotify> {
                     album.artist,
                     style: TextStyle(
                       color: Colors.black87,
-                      fontSize: 10.0,
+                      fontSize: 12.0,
                       fontWeight: FontWeight.w600,
                       shadows: [
                         Shadow(

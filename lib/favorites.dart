@@ -28,16 +28,20 @@ class LikedSongs extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Liked Songs'),
+        foregroundColor: Colors.white,
+        title: Text('Liked Songs', style: TextStyle(color: Colors.white)),
+        backgroundColor: Colors.black,
+        elevation: 0, // Removes the shadow
       ),
+      backgroundColor: Colors.black,
       body: ListView.builder(
         itemCount: likedSongs.length,
         itemBuilder: (context, index) {
           final song = likedSongs[index];
           return ListTile(
             leading: Image.asset(song.assetPath),
-            title: Text(song.title),
-            subtitle: Text(song.artist),
+            title: Text(song.title, style: TextStyle(color: Colors.white)),
+            subtitle: Text(song.artist, style: TextStyle(color: Colors.grey)),
             trailing: IconButton(
               icon: Icon(
                 favoritesNotifier.isFavorite(song)
