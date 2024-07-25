@@ -14,7 +14,10 @@ Future<void> main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  runApp(MyApp());
+  runApp(ChangeNotifierProvider(
+    create: (context) => FavoritesNotifier(),
+    child: MyApp(),
+  ));
 }
 
 class MyApp extends StatelessWidget {
@@ -23,7 +26,7 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(
-          create: (context) => FavoritesNotifier(userId: 'guest_user'),
+          create: (context) => FavoritesNotifier(),
         ),
         ChangeNotifierProvider(
           create: (context) => RecentlyPlayedNotifier(),

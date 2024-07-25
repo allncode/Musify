@@ -8,17 +8,11 @@ import '../widget.dart'; // Import your Song class
 class FavoritesNotifier extends ChangeNotifier {
   List<Song> _favorites = [];
   Song? _currentSong;
-  String userId;
+  String _userId = 'guest_user';
 
-  FavoritesNotifier({required this.userId}) {
-    if (userId.isNotEmpty) {
-      _loadFavorites();
-    }
-  }
-
-  void setUserId(String newUserId) {
-    userId = newUserId;
-    if (userId.isNotEmpty) {
+  void setUserId(String userId) {
+    _userId = userId;
+    if (_userId.isNotEmpty) {
       _loadFavorites();
     }
     notifyListeners();
@@ -64,7 +58,7 @@ class FavoritesNotifier extends ChangeNotifier {
       final prefs = await SharedPreferences.getInstance();
       final favoritesList =
           _favorites.map((song) => jsonEncode(song.toJson())).toList();
-      await prefs.setStringList('favorites_$userId', favoritesList);
+      await prefs.setStringList('favorites_$_userId', favoritesList);
     } catch (e) {
       print('Error saving favorites: $e');
     }
@@ -73,7 +67,7 @@ class FavoritesNotifier extends ChangeNotifier {
   Future<void> _loadFavorites() async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      final favoritesList = prefs.getStringList('favorites_$userId') ?? [];
+      final favoritesList = prefs.getStringList('favorites_$_userId') ?? [];
       _favorites = favoritesList
           .map((songJson) => Song.fromJson(jsonDecode(songJson)))
           .toList();
@@ -96,13 +90,12 @@ class LikedSongs extends StatelessWidget {
     final likedSongs = favoritesNotifier.favorites;
 
     return Scaffold(
+      backgroundColor:
+          Colors.black, // Use Scaffold's backgroundColor instead of Container
       appBar: AppBar(
-        foregroundColor: Colors.white,
-        title: Text('Liked Songs', style: TextStyle(color: Colors.white)),
-        backgroundColor: Colors.black,
-        elevation: 0,
+        title: Text('Liked Songs'),
+        backgroundColor: Colors.black, // Ensure AppBar matches the background
       ),
-      backgroundColor: Colors.black,
       body: ListView.builder(
         itemCount: likedSongs.length,
         itemBuilder: (context, index) {

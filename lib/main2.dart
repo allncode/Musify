@@ -17,17 +17,23 @@ class MySpotify extends StatefulWidget {
 
 class _MySpotifyState extends State<MySpotify> {
   int _selectedIndex = 0;
-  final List<GlobalKey<NavigatorState>> _navigatorKeys = [
-    GlobalKey<NavigatorState>(),
-    GlobalKey<NavigatorState>(),
-    GlobalKey<NavigatorState>(),
+  List<GlobalKey<NavigatorState>> _navigatorKeys = [
+    GlobalKey<NavigatorState>(), // For Home
+    GlobalKey<NavigatorState>(), // For Search
+    GlobalKey<NavigatorState>(), // For Your Library
+    GlobalKey<NavigatorState>(), // For Liked Songs
   ];
+
   final PageController _pageController = PageController();
   List<dynamic> recentlyViewed = [];
   Song? _currentSong;
   List<Song> recentlyPlayed = [];
   bool _isPlaying = false;
-
+  ///////////////////////////////////////////////////////////////////////
+  final List<Widget> _pages = [
+    // other pages here
+    LikedSongs(),
+  ];
   @override
   void initState() {
     super.initState();
@@ -234,8 +240,16 @@ class _MySpotifyState extends State<MySpotify> {
                   );
                 },
               ),
+              Navigator(
+                key: _navigatorKeys[3],
+                onGenerateRoute: (routeSettings) {
+                  return MaterialPageRoute(
+                    builder: (context) => LikedSongs(),
+                  );
+                },
+              ),
             ],
-          ),
+          )
         ],
       ),
       bottomNavigationBar: BottomNavigationBar(
@@ -297,22 +311,19 @@ class _MySpotifyState extends State<MySpotify> {
               children: <Widget>[
                 GestureDetector(
                   onTap: () {
-                    _handleAlbumTap(
-                      Album(
-                        title: 'Liked Songs',
-                        artist: 'Various Artists',
-                        assetPath: 'assets/images/heart.png',
-                        songs: [], // Handle songs or adjust as needed
-                      ),
-                    );
+                    // Use the Navigator corresponding to the current index
+                    _navigatorKeys[_selectedIndex].currentState?.push(
+                          MaterialPageRoute(builder: (context) => LikedSongs()),
+                        );
                   },
                   child: _buildSongCard(
-                      context,
-                      'Liked Songs',
-                      'assets/images/heart.png',
-                      Color(0xff694F8E),
-                      LikedSongs()),
-                ),
+                    context,
+                    'Liked Songs',
+                    'assets/images/heart.png',
+                    Color(0xff694F8E),
+                    LikedSongs(),
+                  ),
+                )
               ],
             ),
             SizedBox(height: 16.0),

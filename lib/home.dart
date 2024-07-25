@@ -30,12 +30,19 @@ class _MyHomePageState extends State<MyHomePage> {
         Provider.of<RecentlyViewedNotifier>(context, listen: false);
     final recentlyPlayedNotifier =
         Provider.of<RecentlyPlayedNotifier>(context, listen: false);
+    final favoritesNotifier =
+        Provider.of<FavoritesNotifier>(context, listen: false);
 
     // Set the user ID in the notifiers
     String userId = widget.email; // Assuming email as user ID; adjust if needed
     recentlyViewedNotifier.setUserId(userId);
     recentlyPlayedNotifier.setUserId(userId);
+    favoritesNotifier.setUserId(userId);
   }
+void _handleLogin(String newUserId) {
+  final favoritesNotifier = Provider.of<FavoritesNotifier>(context, listen: false);
+  favoritesNotifier.setUserId(newUserId);
+}
 
   @override
   Widget build(BuildContext context) {
