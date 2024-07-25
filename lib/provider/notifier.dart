@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../widget.dart'; // Import your Song class
+import '../widget.dart';
 
 class RecentlyViewedNotifier extends ChangeNotifier {
   List<Album> _recentlyViewed = [];
@@ -15,8 +15,15 @@ class RecentlyViewedNotifier extends ChangeNotifier {
   List<Album> get recentlyViewed => _recentlyViewed;
 
   void addAlbum(Album album) {
-    // Add album to the list and persist
-    _recentlyViewed.add(album);
+    _recentlyViewed.remove(album);
+
+    _recentlyViewed.insert(0, album);
+
+    final int _maxItems = 10;
+    if (_recentlyViewed.length > _maxItems) {
+      _recentlyViewed.removeLast();
+    }
+
     _saveRecentlyViewed();
     notifyListeners();
   }
@@ -43,6 +50,8 @@ class RecentlyViewedNotifier extends ChangeNotifier {
 class RecentlyPlayedNotifier extends ChangeNotifier {
   List<Song> _recentlyPlayed = [];
   String _userId = 'guest_user';
+  final int _maxItems = 3;
+  List<Album> _recentlyViewed = [];
 
   List<Song> get recentlyPlayed => _recentlyPlayed;
 
@@ -86,6 +95,21 @@ class RecentlyPlayedNotifier extends ChangeNotifier {
     _recentlyPlayed = playedList
         .map((songJson) => Song.fromJson(jsonDecode(songJson)))
         .toList();
+    notifyListeners();
+  }
+
+  void addAlbum(Album album) {
+    // Remove the oldest album if the list exceeds the maximum length
+    if (_recentlyViewed.length >= _maxItems) {
+      _recentlyViewed.removeLast();
+    }
+
+    // Remove the album if it already exists to add it to the front
+    _recentlyViewed.remove(album);
+
+    // Add the new album to the front of the list
+    _recentlyViewed.insert(0, album);
+
     notifyListeners();
   }
 }

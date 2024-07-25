@@ -25,6 +25,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
+        ChangeNotifierProvider(create: (context) => PlaybackNotifier()),
         ChangeNotifierProvider(
           create: (context) => FavoritesNotifier(),
         ),

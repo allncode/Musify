@@ -90,12 +90,11 @@ class LikedSongs extends StatelessWidget {
     final likedSongs = favoritesNotifier.favorites;
 
     return Scaffold(
-      backgroundColor:
-          Colors.black, // Use Scaffold's backgroundColor instead of Container
+      backgroundColor: Colors.black,
       appBar: AppBar(
-        title: Text('Liked Songs'),
-        backgroundColor: Colors.black, // Ensure AppBar matches the background
-      ),
+          title: Text('Liked Songs'),
+          backgroundColor: Colors.black,
+          foregroundColor: Colors.white),
       body: ListView.builder(
         itemCount: likedSongs.length,
         itemBuilder: (context, index) {

@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -118,12 +119,15 @@ class _MySpotifyState extends State<MySpotify> {
         Provider.of<RecentlyViewedNotifier>(context, listen: false);
 
     if (item is Album) {
+      // Update the RecentlyViewedNotifier with the new album
       recentlyViewedNotifier.addAlbum(item);
-    }
 
-    setState(() {
-      recentlyViewed = recentlyViewedNotifier.recentlyViewed;
-    });
+      // Update the UI to reflect changes
+      setState(() {
+        // Directly use the updated list from the notifier
+        recentlyViewed = recentlyViewedNotifier.recentlyViewed;
+      });
+    }
   }
 
   Future<void> _addToRecentlyPlayed(Song song) async {
@@ -282,6 +286,8 @@ class _MySpotifyState extends State<MySpotify> {
               onMoreOptionsTap: () {},
               onFavoriteTap: _handleFavoriteTap,
               onPlayPauseTap: _handlePlayPauseTap,
+              onPreviousTap: _handlePreviousTap,
+              onNextTap: _handleNextTap,
             );
           },
         ),
@@ -574,4 +580,8 @@ class _MySpotifyState extends State<MySpotify> {
       ),
     );
   }
+
+  void _handleNextTap() {}
+
+  void _handlePreviousTap() {}
 }
