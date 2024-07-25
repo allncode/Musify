@@ -209,90 +209,89 @@ class _MySpotifyState extends State<MySpotify> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
-      body: Stack(
-        children: [
-          PageView(
-            controller: _pageController,
-            onPageChanged: (index) {
-              setState(() {
-                _selectedIndex = index;
-              });
-            },
-            children: [
-              Navigator(
-                key: _navigatorKeys[0],
-                onGenerateRoute: (routeSettings) {
-                  return MaterialPageRoute(
-                    builder: (context) => _buildMusicPage(),
-                  );
-                },
-              ),
-              Navigator(
-                key: _navigatorKeys[1],
-                onGenerateRoute: (routeSettings) {
-                  return MaterialPageRoute(
-                    builder: (context) => SearchScreen(),
-                  );
-                },
-              ),
-              Navigator(
-                key: _navigatorKeys[2],
-                onGenerateRoute: (routeSettings) {
-                  return MaterialPageRoute(
-                    builder: (context) => MyLibrary(),
-                  );
-                },
-              ),
-              Navigator(
-                key: _navigatorKeys[3],
-                onGenerateRoute: (routeSettings) {
-                  return MaterialPageRoute(
-                    builder: (context) => LikedSongs(),
-                  );
-                },
-              ),
-            ],
-          )
-        ],
-      ),
-      bottomNavigationBar: BottomNavigationBar(
         backgroundColor: Colors.black,
-        selectedItemColor: Color(0xff694F8E),
-        unselectedItemColor: Colors.grey,
-        currentIndex: _selectedIndex,
-        items: [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.search),
-            label: 'Search',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.library_music),
-            label: 'Your Library',
-          ),
-        ],
-        onTap: _onItemTapped,
-      ),
-      persistentFooterButtons: [
-        Consumer<FavoritesNotifier>(
-          builder: (context, favoritesNotifier, child) {
-            return MiniMediaPlayer(
-              song: favoritesNotifier.currentSong,
-              onTap: () {},
-              onMoreOptionsTap: () {},
-              onFavoriteTap: _handleFavoriteTap,
-              onPlayPauseTap: _handlePlayPauseTap,
-              onPreviousTap: _handlePreviousTap,
-              onNextTap: _handleNextTap,
-            );
-          },
+        body: Stack(
+          children: [
+            PageView(
+              controller: _pageController,
+              onPageChanged: (index) {
+                setState(() {
+                  _selectedIndex = index;
+                });
+              },
+              children: [
+                Navigator(
+                  key: _navigatorKeys[0],
+                  onGenerateRoute: (routeSettings) {
+                    return MaterialPageRoute(
+                      builder: (context) => _buildMusicPage(),
+                    );
+                  },
+                ),
+                Navigator(
+                  key: _navigatorKeys[1],
+                  onGenerateRoute: (routeSettings) {
+                    return MaterialPageRoute(
+                      builder: (context) => SearchScreen(),
+                    );
+                  },
+                ),
+                Navigator(
+                  key: _navigatorKeys[2],
+                  onGenerateRoute: (routeSettings) {
+                    return MaterialPageRoute(
+                      builder: (context) => MyLibrary(),
+                    );
+                  },
+                ),
+                Navigator(
+                  key: _navigatorKeys[3],
+                  onGenerateRoute: (routeSettings) {
+                    return MaterialPageRoute(
+                      builder: (context) => LikedSongs(),
+                    );
+                  },
+                ),
+              ],
+            )
+          ],
         ),
-      ],
-    );
+        bottomNavigationBar: BottomNavigationBar(
+          backgroundColor: Colors.black,
+          selectedItemColor: Color(0xff694F8E),
+          unselectedItemColor: Colors.grey,
+          currentIndex: _selectedIndex,
+          items: [
+            BottomNavigationBarItem(
+              icon: Icon(Icons.home),
+              label: 'Home',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.search),
+              label: 'Search',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.library_music),
+              label: 'Your Library',
+            ),
+          ],
+          onTap: _onItemTapped,
+        ),
+        persistentFooterButtons: [
+          Consumer<FavoritesNotifier>(
+            builder: (context, favoritesNotifier, child) {
+              return MiniMediaPlayer(
+                song: favoritesNotifier.currentSong,
+                // onTap: () {}, // Provide your own callback if needed
+                onMoreOptionsTap: () {}, // Provide your own callback if needed
+                onFavoriteTap:
+                    _handleFavoriteTap, // Callback for favorite button
+                onPlayPauseTap:
+                    _handlePlayPauseTap, // Callback for play/pause button
+              );
+            },
+          )
+        ]);
   }
 
   Widget _buildMusicPage() {

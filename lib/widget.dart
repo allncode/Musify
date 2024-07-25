@@ -16,7 +16,6 @@ export 'albumDetail.dart';
 export 'likedSongs.dart';
 export 'provider/favoriteProvider.dart';
 export 'provider/service.dart';
-export 'provider/audioservice.dart';
 export 'SongsLibraries/BottomSheetHelper.dart';
 export 'provider/notifier.dart';
-export 'media_player.dart';
+export 'play.dart';

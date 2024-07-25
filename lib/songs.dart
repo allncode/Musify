@@ -26,12 +26,13 @@ class Song {
   final String assetPath;
   final String mp3Path;
 
-  Song(
-      {required this.id,
-      required this.title,
-      required this.artist,
-      required this.assetPath,
-      required this.mp3Path});
+  Song({
+    required this.id,
+    required this.title,
+    required this.artist,
+    required this.assetPath,
+    required this.mp3Path,
+  });
 
   Map<String, dynamic> toJson() => {
         'id': id,
@@ -48,6 +49,7 @@ class Song {
         assetPath: json['assetPath'],
         mp3Path: json['mp3Path'],
       );
+
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -110,7 +112,7 @@ final List<Album> albums = [
         title: 'Pantropiko',
         artist: 'BINI',
         assetPath: 'assets/covers/pantropiko.jpg',
-        mp3Path: 'assets/audio/bini-pantropiko.mp3',
+        mp3Path: 'audio/bini-pantropiko.mp3',
       ),
       Song(
         id: 'bini_karera', // Unique ID

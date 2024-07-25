@@ -2,24 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
 import '../widget.dart'; // Import your Song class
+import 'package:audioplayers/audioplayers.dart';
 
 class MiniMediaPlayer extends StatefulWidget {
   final Song? song;
-  final VoidCallback onTap;
   final VoidCallback onMoreOptionsTap;
   final VoidCallback onFavoriteTap;
   final VoidCallback onPlayPauseTap;
-  final VoidCallback onPreviousTap;
-  final VoidCallback onNextTap;
 
   MiniMediaPlayer({
     required this.song,
-    required this.onTap,
     required this.onMoreOptionsTap,
     required this.onFavoriteTap,
     required this.onPlayPauseTap,
-    required this.onPreviousTap,
-    required this.onNextTap,
   });
 
   @override
@@ -28,6 +23,19 @@ class MiniMediaPlayer extends StatefulWidget {
 
 class _MiniMediaPlayerState extends State<MiniMediaPlayer> {
   bool _isPlaying = false;
+  Duration _position = Duration.zero;
+  Duration _duration = Duration.zero;
+
+  void _updatePosition(Duration position) {
+    setState(() {
+      _position = position;
+    });
+  }
+
+  void _seekTo(double value) async {
+    final position = Duration(milliseconds: value.toInt());
+    // Implement seeking logic
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -41,73 +49,98 @@ class _MiniMediaPlayerState extends State<MiniMediaPlayer> {
       padding: const EdgeInsets.all(8.0),
       child: GestureDetector(
         onTap: () {
-          Navigator.of(context).push(_createPageRoute());
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => ExpandedMediaPlayer(
+                song: widget.song!,
+                onFavoriteTap: widget.onFavoriteTap,
+                // onPlayPauseTap: widget.onPlayPauseTap,
+                onClose: () {},
+              ),
+            ),
+          );
         },
         child: Container(
           decoration: BoxDecoration(
             borderRadius: BorderRadius.all(Radius.circular(5.0)),
             color: Colors.grey[900],
           ),
-          height: 60,
-          child: Row(
-            children: <Widget>[
-              ClipRRect(
-                borderRadius: BorderRadius.circular(3.0),
-                child: Image.asset(
-                  widget.song!.assetPath,
-                  width: 70.0,
-                  height: 60.0,
-                  fit: BoxFit.cover,
-                ),
-              ),
-              SizedBox(width: 8.0),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      widget.song!.title,
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 14.0,
-                      ),
+          height: 116, // Adjust the height to fit the new layout
+          child: Column(
+            children: [
+              Row(
+                children: <Widget>[
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(3.0),
+                    child: Image.asset(
+                      widget.song!.assetPath,
+                      width: 70.0,
+                      height: 60.0,
+                      fit: BoxFit.cover,
                     ),
-                    Text(
-                      widget.song!.artist,
-                      style: TextStyle(
-                        color: Colors.grey,
-                        fontSize: 12.0,
-                      ),
+                  ),
+                  SizedBox(width: 8.0),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          widget.song!.title,
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14.0,
+                          ),
+                        ),
+                        Text(
+                          widget.song!.artist,
+                          style: TextStyle(
+                            color: Colors.grey,
+                            fontSize: 12.0,
+                          ),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
+                  ),
+                  SizedBox(width: 8.0),
+                  IconButton(
+                    icon: FaIcon(
+                      favoritesNotifier.isFavorite(widget.song!)
+                          ? FontAwesomeIcons.solidHeart
+                          : FontAwesomeIcons.heart,
+                      color: favoritesNotifier.isFavorite(widget.song!)
+                          ? Colors.redAccent
+                          : Colors.white,
+                    ),
+                    onPressed: widget.onFavoriteTap,
+                  ),
+                  SizedBox(width: 8.0),
+                  IconButton(
+                    icon: FaIcon(
+                      _isPlaying
+                          ? FontAwesomeIcons.pause
+                          : FontAwesomeIcons.play,
+                      color: Colors.white,
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        _isPlaying = !_isPlaying;
+                      });
+                      widget.onPlayPauseTap();
+                    },
+                  ),
+                ],
               ),
-              SizedBox(width: 8.0),
-              IconButton(
-                icon: FaIcon(
-                  favoritesNotifier.isFavorite(widget.song!)
-                      ? FontAwesomeIcons.solidHeart
-                      : FontAwesomeIcons.heart,
-                  color: favoritesNotifier.isFavorite(widget.song!)
-                      ? Colors.redAccent
-                      : Colors.white,
-                ),
-                onPressed: widget.onFavoriteTap,
-              ),
-              SizedBox(width: 8.0),
-              IconButton(
-                icon: FaIcon(
-                  _isPlaying ? FontAwesomeIcons.pause : FontAwesomeIcons.play,
-                  color: Colors.white,
-                ),
-                onPressed: () {
-                  setState(() {
-                    _isPlaying = !_isPlaying;
-                  });
-                  widget.onPlayPauseTap();
-                },
+              SizedBox(height: 4.0), // Reduced space between Row and Slider
+              Slider(
+                value: _position.inMilliseconds.toDouble(),
+                min: 0.0,
+                max: _duration.inMilliseconds.toDouble(),
+                onChanged: _seekTo,
+                activeColor: Colors.redAccent,
+                inactiveColor: Colors.grey[600],
               ),
             ],
           ),
@@ -115,52 +148,17 @@ class _MiniMediaPlayerState extends State<MiniMediaPlayer> {
       ),
     );
   }
-
-  PageRouteBuilder _createPageRoute() {
-    return PageRouteBuilder(
-      pageBuilder: (context, animation, secondaryAnimation) {
-        return ExpandedMediaPlayer(
-          song: widget.song!,
-          onTap: () {
-            Navigator.of(context).pop();
-          },
-          onMoreOptionsTap: widget.onMoreOptionsTap,
-          onFavoriteTap: widget.onFavoriteTap,
-          onPlayPauseTap: widget.onPlayPauseTap,
-          onPreviousTap: widget.onPreviousTap,
-          onNextTap: widget.onNextTap,
-        );
-      },
-      transitionsBuilder: (context, animation, secondaryAnimation, child) {
-        const begin = Offset(0.0, 1.0);
-        const end = Offset.zero;
-        const curve = Curves.easeInOut;
-        var tween =
-            Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
-        var offsetAnimation = animation.drive(tween);
-        return SlideTransition(position: offsetAnimation, child: child);
-      },
-    );
-  }
 }
 
 class ExpandedMediaPlayer extends StatefulWidget {
   final Song song;
-  final VoidCallback onTap;
-  final VoidCallback onMoreOptionsTap;
+  final VoidCallback onClose;
   final VoidCallback onFavoriteTap;
-  final VoidCallback onPlayPauseTap;
-  final VoidCallback onPreviousTap;
-  final VoidCallback onNextTap;
 
   ExpandedMediaPlayer({
     required this.song,
-    required this.onTap,
-    required this.onMoreOptionsTap,
+    required this.onClose,
     required this.onFavoriteTap,
-    required this.onPlayPauseTap,
-    required this.onPreviousTap,
-    required this.onNextTap,
   });
 
   @override
@@ -168,117 +166,193 @@ class ExpandedMediaPlayer extends StatefulWidget {
 }
 
 class _ExpandedMediaPlayerState extends State<ExpandedMediaPlayer> {
-  double _sliderValue = 0.0; // Placeholder for the current song position
-  Duration _currentPosition = Duration.zero;
-  Duration _totalDuration = Duration.zero;
-  // bool _isPlaying = false;
+  late AudioPlayer _audioPlayer;
+  bool isPlaying = false;
+  Duration duration = Duration.zero;
+  Duration position = Duration.zero;
 
   @override
   void initState() {
     super.initState();
-    // Initialize song duration here if you have access to it
-    _totalDuration = Duration(minutes: 3); // Example duration
+    _audioPlayer = AudioPlayer();
+    _loadSong();
+
+    _audioPlayer.onDurationChanged.listen((d) {
+      setState(() {
+        duration = d;
+      });
+    });
+
+    _audioPlayer.onPositionChanged.listen((p) {
+      _updatePosition(p);
+    });
+
+    _audioPlayer.onPlayerComplete.listen((_) {
+      _nextTrack();
+    });
   }
 
-  void _updateSliderPosition() {
-    // Update the slider position based on the current song progress
+  @override
+  void dispose() {
+    _audioPlayer.dispose();
+    super.dispose();
+  }
+
+  void _updatePosition(Duration position) {
     setState(() {
-      _sliderValue = _currentPosition.inSeconds.toDouble() /
-          _totalDuration.inSeconds.toDouble();
+      this.position = position;
     });
+  }
+
+  void _seekTo(double value) async {
+    final position = Duration(milliseconds: value.toInt());
+    await _audioPlayer.seek(position);
+  }
+
+  void _loadSong() async {
+    String songUrl = widget.song.mp3Path;
+    print('Loading song from path: $songUrl'); // Ensure this path is correct
+    try {
+      await _audioPlayer.setSource(AssetSource(songUrl));
+      _playPause(); // Update the playing state
+    } catch (e) {
+      print("Error loading song: $e");
+    }
+  }
+
+  void _playPause() async {
+    if (isPlaying) {
+      await _audioPlayer.pause();
+    } else {
+      await _audioPlayer.resume();
+    }
+    setState(() {
+      isPlaying = !isPlaying;
+    });
+  }
+
+  void _nextTrack() {
+    // Implement next track logic if needed
+  }
+
+  void _previousTrack() {
+    // Implement previous track logic if needed
   }
 
   @override
   Widget build(BuildContext context) {
     final favoritesNotifier = Provider.of<FavoritesNotifier>(context);
-    final playbackNotifier = Provider.of<PlaybackNotifier>(context);
 
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: Colors.grey[900],
+      appBar: AppBar(
+        title: Text(widget.song.title),
+        backgroundColor: Colors.black,
+        foregroundColor: Colors.white,
+        actions: [],
+      ),
       body: Column(
         children: [
-          AppBar(
-            title: Text(widget.song.title),
-            actions: [
-              IconButton(
-                icon: Icon(Icons.more_vert),
-                onPressed: widget.onMoreOptionsTap,
-              ),
-            ],
-          ),
           Expanded(
-            child: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Image.asset(widget.song.assetPath, height: 200.0),
-                  Text(widget.song.title,
-                      style: TextStyle(color: Colors.white, fontSize: 24.0)),
-                  Text(widget.song.artist,
-                      style: TextStyle(color: Colors.grey, fontSize: 18.0)),
-                  Slider(
-                    value: _sliderValue,
-                    onChanged: (value) {
-                      setState(() {
-                        _sliderValue = value;
-                        // Update song playback position here
-                      });
-                    },
-                    min: 0.0,
-                    max: 1.0,
-                    activeColor: Colors.redAccent,
-                    inactiveColor: Colors.grey,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(8.0),
+                  child: Image.asset(
+                    widget.song.assetPath,
+                    width: 150.0,
+                    height: 150.0,
+                    fit: BoxFit.cover,
                   ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      IconButton(
-                        icon: FaIcon(
-                          favoritesNotifier.isFavorite(widget.song)
-                              ? FontAwesomeIcons.solidHeart
-                              : FontAwesomeIcons.heart,
-                          color: favoritesNotifier.isFavorite(widget.song)
-                              ? Colors.redAccent
-                              : Colors.white,
-                        ),
-                        onPressed: () {
-                          widget.onFavoriteTap();
-                          // Optionally, update the favorite status directly here
-                        },
-                      ),
-                      IconButton(
-                        icon: Icon(Icons.skip_previous, color: Colors.white),
-                        onPressed: widget.onPreviousTap,
-                      ),
-                      IconButton(
-                        icon: Icon(
-                          playbackNotifier.isPlaying
-                              ? Icons.pause
-                              : Icons.play_arrow,
-                          color: Colors.white,
-                        ),
-                        onPressed: () {
-                          playbackNotifier.togglePlayback();
-                          widget.onPlayPauseTap();
-                        },
-                      ),
-                      IconButton(
-                        icon: Icon(Icons.skip_next, color: Colors.white),
-                        onPressed: widget.onNextTap,
-                      ),
-                      IconButton(
-                        icon: Icon(Icons.keyboard_arrow_down,
-                            color: Colors.white),
-                        onPressed: widget.onTap,
-                      ),
-                    ],
+                ),
+                SizedBox(height: 20.0),
+                Text(
+                  widget.song.title,
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 24.0,
                   ),
-                ],
-              ),
+                ),
+                Text(
+                  widget.song.artist,
+                  style: TextStyle(
+                    color: Colors.grey,
+                    fontSize: 16.0,
+                  ),
+                ),
+                IconButton(
+                  icon: FaIcon(
+                    favoritesNotifier.isFavorite(widget.song)
+                        ? FontAwesomeIcons.solidHeart
+                        : FontAwesomeIcons.heart,
+                    color: favoritesNotifier.isFavorite(widget.song)
+                        ? Colors.redAccent
+                        : Colors.white,
+                  ),
+                  onPressed: widget.onFavoriteTap,
+                ),
+                SizedBox(height: 20.0),
+                Slider(
+                  value: position.inMilliseconds.toDouble(),
+                  min: 0.0,
+                  max: duration.inMilliseconds.toDouble(),
+                  onChanged: _seekTo,
+                  activeColor: Colors.redAccent,
+                  inactiveColor: Colors.grey[600],
+                ),
+                SizedBox(height: 20.0),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    IconButton(
+                      icon: FaIcon(FontAwesomeIcons.backward,
+                          color: Colors.white),
+                      onPressed: _previousTrack,
+                    ),
+                    IconButton(
+                      icon: FaIcon(
+                        isPlaying
+                            ? FontAwesomeIcons.pause
+                            : FontAwesomeIcons.play,
+                        color: Colors.white,
+                      ),
+                      onPressed: _playPause,
+                    ),
+                    IconButton(
+                      icon:
+                          FaIcon(FontAwesomeIcons.forward, color: Colors.white),
+                      onPressed: _nextTrack,
+                    ),
+                  ],
+                ),
+              ],
             ),
           ),
         ],
       ),
     );
+  }
+}
+
+class PlaybackNotifier extends ChangeNotifier {
+  bool _isPlaying = false;
+
+  bool get isPlaying => _isPlaying;
+
+  void togglePlayback() {
+    _isPlaying = !_isPlaying;
+    notifyListeners();
+  }
+
+  void play() {
+    _isPlaying = true;
+    notifyListeners();
+  }
+
+  void pause() {
+    _isPlaying = false;
+    notifyListeners();
   }
 }
