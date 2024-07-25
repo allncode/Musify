@@ -11,6 +11,7 @@ export 'home/search.dart';
 export 'media_player.dart';
 export 'player.dart';
 export 'songs.dart';
+export 'main2.dart';
 export 'albumDetail.dart';
 export 'likedSongs.dart';
 export 'provider/favoriteProvider.dart';

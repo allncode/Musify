@@ -5,14 +5,12 @@ import '../widget.dart'; // Import your Song class
 
 class RecentlyViewedNotifier extends ChangeNotifier {
   List<Album> _recentlyViewed = [];
-  String userId;
+  String _userId = 'guest_user';
 
   void setUserId(String userId) {
-    userId = userId;
+    _userId = userId;
     loadRecentlyViewed(); // Load data when userId is set
   }
-
-  RecentlyViewedNotifier({required this.userId});
 
   List<Album> get recentlyViewed => _recentlyViewed;
 
@@ -26,7 +24,7 @@ class RecentlyViewedNotifier extends ChangeNotifier {
   Future<void> loadRecentlyViewed() async {
     final prefs = await SharedPreferences.getInstance();
     final recentlyViewedList =
-        prefs.getStringList('$userId-recentlyViewed') ?? [];
+        prefs.getStringList('$_userId-recentlyViewed') ?? [];
     _recentlyViewed = recentlyViewedList.map((item) {
       final json = jsonDecode(item);
       return Album.fromJson(json);
@@ -38,7 +36,7 @@ class RecentlyViewedNotifier extends ChangeNotifier {
     final prefs = await SharedPreferences.getInstance();
     final recentlyViewedList =
         _recentlyViewed.map((album) => jsonEncode(album.toJson())).toList();
-    await prefs.setStringList('$userId-recentlyViewed', recentlyViewedList);
+    await prefs.setStringList('$_userId-recentlyViewed', recentlyViewedList);
   }
 }
 

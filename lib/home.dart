@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
-import 'widget.dart';
+import 'widget.dart'; // Import your widgets
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart'; // Import provider package
+import 'widget.dart'; // Import your notifiers
 
 class MyHomePage extends StatefulWidget {
   final String email;
@@ -20,6 +22,21 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  @override
+  void initState() {
+    super.initState();
+    // Initialize notifiers with user ID
+    final recentlyViewedNotifier =
+        Provider.of<RecentlyViewedNotifier>(context, listen: false);
+    final recentlyPlayedNotifier =
+        Provider.of<RecentlyPlayedNotifier>(context, listen: false);
+
+    // Set the user ID in the notifiers
+    String userId = widget.email; // Assuming email as user ID; adjust if needed
+    recentlyViewedNotifier.setUserId(userId);
+    recentlyPlayedNotifier.setUserId(userId);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -115,7 +132,8 @@ class _MyHomePageState extends State<MyHomePage> {
                 end: Alignment.bottomLeft,
               ),
             ),
-            child: Center(child: MySpotify()),
+            child: Center(
+                child: MySpotify()), // Assuming MySpotify displays content
           ),
         ],
       ),
