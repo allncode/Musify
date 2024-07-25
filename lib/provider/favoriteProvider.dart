@@ -1,28 +1,38 @@
-import 'package:provider/provider.dart';
-
-import '../widget.dart'; // Import your Song class
-
 import 'package:flutter/material.dart';
-import 'dart:convert';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:convert';
 import 'package:fluttertoast/fluttertoast.dart';
+import '../widget.dart'; // Import your Song class
 
 class FavoritesNotifier extends ChangeNotifier {
   List<Song> _favorites = [];
   Song? _currentSong;
+  String userId;
+
+  FavoritesNotifier({required this.userId}) {
+    if (userId.isNotEmpty) {
+      _loadFavorites();
+    }
+  }
+
+  void setUserId(String newUserId) {
+    userId = newUserId;
+    if (userId.isNotEmpty) {
+      _loadFavorites();
+    }
+    notifyListeners();
+  }
 
   List<Song> get favorites => _favorites;
   Song? get currentSong => _currentSong;
-
-  FavoritesNotifier() {
-    _loadFavorites();
-  }
 
   void addSong(Song song) {
     if (!_favorites.contains(song)) {
       _favorites.add(song);
       _saveFavorites();
       notifyListeners();
+      Fluttertoast.showToast(msg: "Song added to favorites");
     }
   }
 
@@ -31,6 +41,7 @@ class FavoritesNotifier extends ChangeNotifier {
       _favorites.remove(song);
       _saveFavorites();
       notifyListeners();
+      Fluttertoast.showToast(msg: "Song removed from favorites");
     }
   }
 
@@ -43,20 +54,38 @@ class FavoritesNotifier extends ChangeNotifier {
     notifyListeners();
   }
 
+  void setFavorites(List<Song> newFavorites) {
+    _favorites = newFavorites;
+    notifyListeners();
+  }
+
   Future<void> _saveFavorites() async {
-    final prefs = await SharedPreferences.getInstance();
-    final favoritesList =
-        _favorites.map((song) => jsonEncode(song.toJson())).toList();
-    await prefs.setStringList('favorites', favoritesList);
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final favoritesList =
+          _favorites.map((song) => jsonEncode(song.toJson())).toList();
+      await prefs.setStringList('favorites_$userId', favoritesList);
+    } catch (e) {
+      print('Error saving favorites: $e');
+    }
   }
 
   Future<void> _loadFavorites() async {
-    final prefs = await SharedPreferences.getInstance();
-    final favoritesList = prefs.getStringList('favorites') ?? [];
-    _favorites = favoritesList
-        .map((songJson) => Song.fromJson(jsonDecode(songJson)))
-        .toList();
-    notifyListeners();
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final favoritesList = prefs.getStringList('favorites_$userId') ?? [];
+      _favorites = favoritesList
+          .map((songJson) => Song.fromJson(jsonDecode(songJson)))
+          .toList();
+      notifyListeners();
+    } catch (e) {
+      print('Error loading favorites: $e');
+    }
+  }
+
+  // Public method to expose loading favorites functionality
+  Future<void> loadFavorites() async {
+    await _loadFavorites();
   }
 }
 
@@ -94,23 +123,21 @@ class LikedSongs extends StatelessWidget {
               onPressed: () {
                 if (favoritesNotifier.isFavorite(song)) {
                   favoritesNotifier.removeSong(song);
-                  print("${song.title} removed from favorites"); // Debugging
                   Fluttertoast.showToast(
                     msg: "${song.title} removed from favorites",
                     toastLength: Toast.LENGTH_SHORT,
                     gravity: ToastGravity.BOTTOM,
-                    backgroundColor: Colors.black87,
-                    textColor: Colors.white,
+                    backgroundColor: Colors.grey,
+                    textColor: Colors.black,
                   );
                 } else {
                   favoritesNotifier.addSong(song);
-                  print("${song.title} added to favorites"); // Debugging
                   Fluttertoast.showToast(
                     msg: "${song.title} added to favorites",
                     toastLength: Toast.LENGTH_SHORT,
                     gravity: ToastGravity.BOTTOM,
-                    backgroundColor: Colors.black87,
-                    textColor: Colors.white,
+                    backgroundColor: Colors.grey,
+                    textColor: Colors.black,
                   );
                 }
               },

@@ -1,37 +1,37 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
-import 'package:myapp/splash_screen.dart';
-import 'package:myapp/widget.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'firebase_options.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'firebase_options.dart';
+import 'splash_screen.dart';
+import 'widget.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  runApp(
-    ChangeNotifierProvider(
-      create: (_) => FavoritesNotifier(),
-      child: MyApp(),
-    ),
-  );
+
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (context) => FavoritesNotifier(),
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(
+          create: (context) => FavoritesNotifier(userId: 'guest_user'),
+        ),
+        ChangeNotifierProvider(
+          create: (context) => RecentlyPlayedNotifier(),
+        ),
+        ChangeNotifierProvider(
+          create: (context) => RecentlyViewedNotifier(userId: 'guest_user'),
+        ),
+      ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         title: 'Flutter Demo',
@@ -68,12 +68,79 @@ class _MySpotifyState extends State<MySpotify> {
   final PageController _pageController = PageController();
   List<dynamic> recentlyViewed = [];
   Song? _currentSong;
-  List<dynamic> recentlyPlayed = [];
+  List<Song> recentlyPlayed = [];
   bool _isPlaying = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadInitialData();
+  }
+
+  Future<void> _loadInitialData() async {
+    await _loadSong();
+    await _loadFavorites();
+    await _loadRecentlyPlayed();
+    await _loadRecentlyViewed();
+  }
+
+  Future<void> _loadSong() async {
+    _currentSong = await loadCurrentSong();
+    setState(() {});
+  }
+
+  Future<void> _loadFavorites() async {
+    final favoritesNotifier =
+        Provider.of<FavoritesNotifier>(context, listen: false);
+    await favoritesNotifier.loadFavorites();
+  }
+
+  Future<void> _loadRecentlyPlayed() async {
+    final recentlyPlayedNotifier =
+        Provider.of<RecentlyPlayedNotifier>(context, listen: false);
+    await recentlyPlayedNotifier.loadRecentlyPlayed();
+    setState(() {
+      recentlyPlayed = recentlyPlayedNotifier.recentlyPlayed;
+    });
+  }
+
+  Future<void> _loadRecentlyViewed() async {
+    final recentlyViewedNotifier =
+        Provider.of<RecentlyViewedNotifier>(context, listen: false);
+    await recentlyViewedNotifier.loadRecentlyViewed();
+    print('Loaded Recently Viewed: ${recentlyViewedNotifier.recentlyViewed}');
+    setState(() {
+      recentlyViewed = recentlyViewedNotifier.recentlyViewed;
+    });
+  }
+
+  Future<void> _onUserLogin(String newUserId) async {
+    final favoritesNotifier =
+        Provider.of<FavoritesNotifier>(context, listen: false);
+    final recentlyPlayedNotifier =
+        Provider.of<RecentlyPlayedNotifier>(context, listen: false);
+    final recentlyViewedNotifier =
+        Provider.of<RecentlyViewedNotifier>(context, listen: false);
+
+    favoritesNotifier.setUserId(newUserId);
+    recentlyPlayedNotifier.setUserId(newUserId);
+    recentlyViewedNotifier.setUserId(newUserId);
+
+    // Reload data
+    await _loadFavorites();
+    await _loadRecentlyPlayed();
+    await _loadRecentlyViewed();
+  }
+
+  Future<void> _loginUser(String userId) async {
+    // Perform login actions
+
+    // After login, load user-specific data
+    await _onUserLogin(userId);
+  }
 
   void _onItemTapped(int index) {
     if (_selectedIndex == index) {
-      // If the user taps the tab bar item twice, it should pop to the first route
       _navigatorKeys[index].currentState!.popUntil((route) => route.isFirst);
     } else {
       setState(() {
@@ -83,43 +150,25 @@ class _MySpotifyState extends State<MySpotify> {
     }
   }
 
-  void _addToRecentlyViewed(String title, String artist, String assetPath) {
+  Future<void> _addToRecentlyViewed(dynamic item) async {
+    final recentlyViewedNotifier =
+        Provider.of<RecentlyViewedNotifier>(context, listen: false);
+
+    if (item is Album) {
+      recentlyViewedNotifier.addAlbum(item);
+    }
+
     setState(() {
-      final newEntry = {
-        'title': title,
-        'artist': artist,
-        'assetPath': assetPath,
-      };
-
-      final existingIndex = recentlyViewed.indexWhere((entry) =>
-          entry['title'] == title &&
-          entry['artist'] == artist &&
-          entry['assetPath'] == assetPath);
-
-      if (existingIndex != -1) {
-        recentlyViewed.removeAt(existingIndex);
-      }
-
-      recentlyViewed.add(newEntry);
-
-      if (recentlyViewed.length > 5) {
-        recentlyViewed.removeAt(0);
-      }
-
-      _saveRecentlyViewed(); // Save to SharedPreferences
+      recentlyViewed = recentlyViewedNotifier.recentlyViewed;
     });
   }
 
-  void _addToRecentlyPlayed(Song song) {
+  Future<void> _addToRecentlyPlayed(Song song) async {
+    final recentlyPlayedNotifier =
+        Provider.of<RecentlyPlayedNotifier>(context, listen: false);
+    await recentlyPlayedNotifier.addSong(song);
     setState(() {
-      if (!recentlyPlayed.any((s) => s == song)) {
-        recentlyPlayed.add(song);
-        if (recentlyPlayed.length > 5) {
-          recentlyPlayed.removeAt(0);
-        }
-      }
-
-      _saveRecentlyPlayed(); // Save to SharedPreferences
+      recentlyPlayed = recentlyPlayedNotifier.recentlyPlayed;
     });
   }
 
@@ -135,12 +184,13 @@ class _MySpotifyState extends State<MySpotify> {
     final favoritesNotifier =
         Provider.of<FavoritesNotifier>(context, listen: false);
 
-    if (favoritesNotifier.isFavorite(_currentSong!)) {
+    if (_currentSong != null && favoritesNotifier.isFavorite(_currentSong!)) {
       favoritesNotifier.removeSong(_currentSong!);
     } else {
       favoritesNotifier.addSong(_currentSong!);
     }
 
+    // Update the state after changing favorite status
     setState(() {
       _currentSong = favoritesNotifier.currentSong;
     });
@@ -161,6 +211,7 @@ class _MySpotifyState extends State<MySpotify> {
     setState(() {
       _currentSong = song;
       _isPlaying = true;
+      _addToRecentlyPlayed(song); // Add to recently played when song is tapped
     });
   }
 
@@ -172,73 +223,21 @@ class _MySpotifyState extends State<MySpotify> {
         );
   }
 
-////////////////////////////////////////////////////////////////////////////
-  // Future<void> saveCurrentSong(Song song) async {
-  //   final prefs = await SharedPreferences.getInstance();
-  //   final songJson = jsonEncode(song.toJson());
-  //   await prefs.setString('currentSong', songJson);
-  // }
-
-  // Future<Song?> loadCurrentSong() async {
-  //   final prefs = await SharedPreferences.getInstance();
-  //   final songJson = prefs.getString('currentSong');
-  //   if (songJson != null) {
-  //     final songMap = jsonDecode(songJson);
-  //     return Song.fromJson(songMap);
-  //   }
-  //   return null;
-  // }
-
-////////////////////////////////////////////////////////////////////////////
-  Future<void> _saveRecentlyViewed() async {
+  Future<void> saveCurrentSong(Song song) async {
     final prefs = await SharedPreferences.getInstance();
-    final viewedList =
-        recentlyViewed.map((entry) => jsonEncode(entry.toJson())).toList();
-    await prefs.setStringList('recentlyViewed', viewedList);
-    print('Saved Recently Viewed: $viewedList');
+    final songJson = jsonEncode(song.toJson());
+    await prefs.setString('currentSong', songJson);
   }
 
-  Future<void> _loadRecentlyViewed() async {
+  Future<Song?> loadCurrentSong() async {
     final prefs = await SharedPreferences.getInstance();
-    final viewedList = prefs.getStringList('recentlyViewed') ?? [];
-    print('Loaded Recently Viewed: $viewedList');
-    setState(() {
-      recentlyViewed = viewedList.map((entryJson) {
-        final entryMap = jsonDecode(entryJson) as Map<String, dynamic>;
-        if (entryMap.containsKey('songs')) {
-          return Album.fromJson(entryMap);
-        } else {
-          return Song.fromJson(entryMap);
-        }
-      }).toList();
-    });
+    final songJson = prefs.getString('currentSong');
+    if (songJson != null) {
+      final songMap = jsonDecode(songJson);
+      return Song.fromJson(songMap);
+    }
+    return null;
   }
-
-  Future<void> _saveRecentlyPlayed() async {
-    final prefs = await SharedPreferences.getInstance();
-    final playedList =
-        recentlyPlayed.map((song) => jsonEncode(song.toJson())).toList();
-    await prefs.setStringList('recentlyPlayed', playedList);
-  }
-
-  Future<void> _loadRecentlyPlayed() async {
-    final prefs = await SharedPreferences.getInstance();
-    final playedList = prefs.getStringList('recentlyPlayed') ?? [];
-    setState(() {
-      recentlyPlayed = playedList
-          .map((songJson) => Song.fromJson(jsonDecode(songJson)))
-          .toList();
-    });
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    _loadRecentlyViewed();
-    _loadRecentlyPlayed();
-  }
-
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
   @override
   Widget build(BuildContext context) {
@@ -340,7 +339,16 @@ class _MySpotifyState extends State<MySpotify> {
               physics: NeverScrollableScrollPhysics(),
               children: <Widget>[
                 GestureDetector(
-                  onTap: _handleGridItemTap,
+                  onTap: () {
+                    _handleAlbumTap(
+                      Album(
+                        title: 'Liked Songs',
+                        artist: 'Various Artists',
+                        assetPath: 'assets/images/heart.png',
+                        songs: [], // Handle songs or adjust as needed
+                      ),
+                    );
+                  },
                   child: _buildSongCard(
                       context,
                       'Liked Songs',
@@ -361,7 +369,10 @@ class _MySpotifyState extends State<MySpotify> {
               child: ListView(
                 scrollDirection: Axis.horizontal,
                 children: albums.map((album) {
-                  return _buildAlbumCard(album);
+                  return GestureDetector(
+                    onTap: () => _handleAlbumTap(album),
+                    child: _buildAlbumCard(album),
+                  );
                 }).toList(),
               ),
             ),
@@ -377,11 +388,7 @@ class _MySpotifyState extends State<MySpotify> {
                 scrollDirection: Axis.horizontal,
                 children: _getAllSongsFromAlbums().map((song) {
                   return GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        _currentSong = song;
-                      });
-                    },
+                    onTap: () => _handleSongTap(song),
                     child: _buildSongCardForListView(song),
                   );
                 }).toList(),
@@ -398,52 +405,22 @@ class _MySpotifyState extends State<MySpotify> {
                 height: 170.0,
                 child: ListView(
                   scrollDirection: Axis.horizontal,
-                  children: recentlyViewed.reversed.map((viewedItem) {
-                    if (viewedItem.containsKey('assetPath') &&
-                        viewedItem.containsKey('title') &&
-                        viewedItem.containsKey('artist')) {
-                      // Handle album
-                      final album = Album(
-                        title: viewedItem['title']!,
-                        artist: viewedItem['artist']!,
-                        assetPath: viewedItem['assetPath']!,
-                        songs: albums
-                            .firstWhere(
-                                (album) => album.title == viewedItem['title']!)
-                            .songs,
-                      );
-                      return GestureDetector(
-                        onTap: () {
-                          Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (context) => AlbumDetailScreen(
-                                title: album.title,
-                                artist: album.artist,
-                                assetPath: album.assetPath,
-                                songs: album.songs,
-                              ),
+                  children: recentlyViewed.map((album) {
+                    return GestureDetector(
+                      onTap: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) => AlbumDetailScreen(
+                              title: album.title,
+                              artist: album.artist,
+                              assetPath: album.assetPath,
+                              songs: album.songs,
                             ),
-                          );
-                        },
-                        child: _buildAlbumCard(album),
-                      );
-                    } else {
-                      // Handle song
-                      final song = Song(
-                        title: viewedItem['title']!,
-                        artist: viewedItem['artist']!,
-                        assetPath: viewedItem['assetPath']!,
-                        mp3Path: viewedItem['mp3Path']!,
-                      );
-                      return GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            _currentSong = song;
-                          });
-                        },
-                        child: _buildSongCardForListView(song),
-                      );
-                    }
+                          ),
+                        );
+                      },
+                      child: _buildAlbumCard(album),
+                    );
                   }).toList(),
                 ),
               ),
@@ -567,7 +544,7 @@ class _MySpotifyState extends State<MySpotify> {
   Widget _buildAlbumCard(Album album) {
     return GestureDetector(
       onTap: () {
-        _addToRecentlyViewed(album.title, album.artist, album.assetPath);
+        _addToRecentlyViewed(album);
         _handleAlbumTap(album);
       },
       child: Container(
