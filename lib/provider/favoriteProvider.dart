@@ -22,20 +22,20 @@ class FavoritesNotifier extends ChangeNotifier {
   Song? get currentSong => _currentSong;
 
   void addSong(Song song) {
+    print('Adding song: ${song.title}');
     if (!_favorites.contains(song)) {
       _favorites.add(song);
       _saveFavorites();
       notifyListeners();
-      Fluttertoast.showToast(msg: "Song added to favorites");
     }
   }
 
   void removeSong(Song song) {
+    print('Removing song: ${song.title}');
     if (_favorites.contains(song)) {
       _favorites.remove(song);
       _saveFavorites();
       notifyListeners();
-      Fluttertoast.showToast(msg: "Song removed from favorites");
     }
   }
 

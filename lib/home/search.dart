@@ -51,20 +51,6 @@ class _SearchScreenState extends State<SearchScreen> {
     });
   }
 
-  void _handleSongTap(Song song) {
-    final favoritesNotifier =
-        Provider.of<FavoritesNotifier>(context, listen: false);
-
-    favoritesNotifier.setCurrentSong(song);
-    Song? _currentSong;
-    bool _isPlaying = false;
-
-    setState(() {
-      _currentSong = song;
-      _isPlaying = true;
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -101,15 +87,21 @@ class _SearchScreenState extends State<SearchScreen> {
                     children: _filteredResults.map((result) {
                       if (result is Song) {
                         return _buildSearchResultCard(
-                            result.title, result.artist, result.assetPath,
-                            isSong: true,
-                            song: result,
-                            favoritesNotifier: favoritesNotifier);
+                          result.title,
+                          result.artist,
+                          result.assetPath,
+                          isSong: true,
+                          song: result,
+                          favoritesNotifier: favoritesNotifier,
+                        );
                       } else if (result is Album) {
                         return _buildSearchResultCard(
-                            result.title, result.artist, result.assetPath,
-                            isSong: false,
-                            favoritesNotifier: favoritesNotifier);
+                          result.title,
+                          result.artist,
+                          result.assetPath,
+                          isSong: false,
+                          favoritesNotifier: favoritesNotifier,
+                        );
                       } else {
                         return SizedBox.shrink(); // Handle unexpected cases
                       }
@@ -144,45 +136,27 @@ class _SearchScreenState extends State<SearchScreen> {
           style: TextStyle(color: Colors.grey),
         ),
         trailing: isSong
-            ? Consumer<FavoritesNotifier>(
-                builder: (context, favoritesNotifier, child) {
-                  bool isFavorite =
-                      song != null && favoritesNotifier.isFavorite(song);
-
-                  return IconButton(
-                    icon: Icon(
-                      isFavorite
-                          ? FontAwesomeIcons.solidHeart
-                          : FontAwesomeIcons.heart,
-                      color: isFavorite ? Colors.redAccent : Colors.white,
-                    ),
-                    onPressed: () {
-                      if (isFavorite) {
-                        favoritesNotifier.removeSong(song!);
-                        Fluttertoast.showToast(
-                          msg: "Removed from favorites",
-                          backgroundColor: Colors.black,
-                          textColor: Colors.white,
-                        );
-                      } else {
-                        favoritesNotifier.addSong(song!);
-                        Fluttertoast.showToast(
-                          msg: "Added to favorites",
-                          backgroundColor: Colors.black,
-                          textColor: Colors.white,
-                        );
-                      }
-                    },
-                  );
+            ? IconButton(
+                icon: Icon(
+                  favoritesNotifier.isFavorite(song!)
+                      ? FontAwesomeIcons.solidHeart
+                      : FontAwesomeIcons.heart,
+                  color: favoritesNotifier.isFavorite(song)
+                      ? Colors.redAccent
+                      : Colors.white,
+                ),
+                onPressed: () {
+                  if (favoritesNotifier.isFavorite(song)) {
+                    favoritesNotifier.removeSong(song);
+                  } else {
+                    favoritesNotifier.addSong(song);
+                  }
                 },
               )
             : null,
         onTap: () {
           if (isSong) {
-            final song = _allSongs.firstWhere(
-              (song) => song.title == title && song.artist == artist,
-            );
-            _handleSongTap(song);
+            _handleSongTap(song!);
           } else {
             Navigator.of(context).push(
               MaterialPageRoute(
@@ -200,5 +174,19 @@ class _SearchScreenState extends State<SearchScreen> {
         },
       ),
     );
+  }
+
+  void _handleSongTap(Song song) {
+    final favoritesNotifier =
+        Provider.of<FavoritesNotifier>(context, listen: false);
+
+    favoritesNotifier.setCurrentSong(song);
+    Song? _currentSong;
+    bool _isPlaying = false;
+
+    setState(() {
+      _currentSong = song;
+      _isPlaying = true;
+    });
   }
 }

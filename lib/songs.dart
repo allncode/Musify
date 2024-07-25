@@ -48,6 +48,19 @@ class Song {
         assetPath: json['assetPath'],
         mp3Path: json['mp3Path'],
       );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is Song &&
+          runtimeType == other.runtimeType &&
+          title == other.title &&
+          artist == other.artist &&
+          assetPath == other.assetPath &&
+          mp3Path == other.mp3Path);
+
+  @override
+  int get hashCode =>
+      title.hashCode ^ artist.hashCode ^ assetPath.hashCode ^ mp3Path.hashCode;
 }
 
 class Album {
