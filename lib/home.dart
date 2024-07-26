@@ -25,7 +25,6 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     super.initState();
-    // Initialize notifiers with user ID
     final recentlyViewedNotifier =
         Provider.of<RecentlyViewedNotifier>(context, listen: false);
     final recentlyPlayedNotifier =
@@ -33,9 +32,7 @@ class _MyHomePageState extends State<MyHomePage> {
     final favoritesNotifier =
         Provider.of<FavoritesNotifier>(context, listen: false);
 
-    // Set the user ID in the notifiers
-    String userId = widget.email; // Assuming email as user ID; adjust if needed
-    recentlyViewedNotifier.setUserId(userId);
+    String userId = widget.email;
     recentlyPlayedNotifier.setUserId(userId);
     favoritesNotifier.setUserId(userId);
   }
@@ -141,8 +138,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 end: Alignment.bottomLeft,
               ),
             ),
-            child: Center(
-                child: MySpotify()), // Assuming MySpotify displays content
+            child: Center(child: MySpotify()),
           ),
         ],
       ),

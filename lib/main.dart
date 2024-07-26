@@ -8,7 +8,7 @@ import 'firebase_options.dart';
 import 'splash_screen.dart';
 import 'widget.dart';
 
-import 'package:firebase_auth/firebase_auth.dart'; // Add this import
+import 'package:firebase_auth/firebase_auth.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -28,6 +28,7 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (context) => PlaybackNotifier()),
+        ChangeNotifierProvider(create: (context) => LibraryNotifier()),
         ChangeNotifierProvider(create: (context) => PlaybackNotifier()),
         ChangeNotifierProvider(create: (context) => FavoritesNotifier()),
         ChangeNotifierProvider(create: (context) => RecentlyPlayedNotifier()),
@@ -41,7 +42,7 @@ class MyApp extends StatelessWidget {
           useMaterial3: true,
           textTheme: GoogleFonts.poppinsTextTheme(Theme.of(context).textTheme),
         ),
-        home: const MySplashScreen(), // Splash screen is the entry point
+        home: const MySplashScreen(),
         routes: {
           '/search': (context) => SearchScreen(),
           '/your_library': (context) => MyLibrary(),

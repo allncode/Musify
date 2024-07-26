@@ -92,16 +92,12 @@ class _MySpotifyState extends State<MySpotify> {
     recentlyPlayedNotifier.setUserId(newUserId);
     recentlyViewedNotifier.setUserId(newUserId);
 
-    // Reload data
     await _loadFavorites();
     await _loadRecentlyPlayed();
     await _loadRecentlyViewed();
   }
 
   Future<void> _loginUser(String userId) async {
-    // Perform login actions
-
-    // After login, load user-specific data
     await _onUserLogin(userId);
   }
 
@@ -121,12 +117,9 @@ class _MySpotifyState extends State<MySpotify> {
         Provider.of<RecentlyViewedNotifier>(context, listen: false);
 
     if (item is Album) {
-      // Update the RecentlyViewedNotifier with the new album
       recentlyViewedNotifier.addAlbum(item);
 
-      // Update the UI to reflect changes
       setState(() {
-        // Directly use the updated list from the notifier
         recentlyViewed = recentlyViewedNotifier.recentlyViewed;
       });
     }
@@ -159,7 +152,6 @@ class _MySpotifyState extends State<MySpotify> {
       favoritesNotifier.addSong(_currentSong!);
     }
 
-    // Update the state after changing favorite status
     setState(() {
       _currentSong = favoritesNotifier.currentSong;
     });
@@ -313,11 +305,11 @@ class _MySpotifyState extends State<MySpotify> {
             builder: (context, favoritesNotifier, child) {
               return MiniMediaPlayer(
                 song: favoritesNotifier.currentSong,
-                onTap: () {}, // Provide your own callback if needed
-                onMoreOptionsTap: () {}, // Provide your own callback if needed
-                onFavoriteTap:
-                    _handleFavoriteTap, // This toggles the favorite status
-                onPlayPauseTap: _handlePlayPauseTap, onNextTap: _playNextSong,
+                onTap: () {},
+                onMoreOptionsTap: () {},
+                onFavoriteTap: _handleFavoriteTap,
+                onPlayPauseTap: _handlePlayPauseTap,
+                onNextTap: _playNextSong,
                 onPrevTap: _playPreviousSong,
               );
             },
@@ -347,7 +339,6 @@ class _MySpotifyState extends State<MySpotify> {
               children: <Widget>[
                 GestureDetector(
                   onTap: () {
-                    // Use the Navigator corresponding to the current index
                     _navigatorKeys[_selectedIndex].currentState?.push(
                           MaterialPageRoute(builder: (context) => LikedSongs()),
                         );
@@ -532,7 +523,6 @@ class _MySpotifyState extends State<MySpotify> {
   }
 
   void _handleAlbumTap(Album album) {
-    // Use the correct Navigator key for the selected page
     _navigatorKeys[_selectedIndex].currentState?.push(
           MaterialPageRoute(
             builder: (context) => AlbumDetailScreen(

@@ -100,7 +100,6 @@ class _MiniMediaPlayerState extends State<MiniMediaPlayer> {
   }
 
   void _updateFavoriteStatus() {
-    // Replace with actual logic to check if the song is favorite
     setState(() {
       _isFavorite = Provider.of<FavoritesNotifier>(context, listen: false)
           .isFavorite(widget.song!);
@@ -136,7 +135,6 @@ class _MiniMediaPlayerState extends State<MiniMediaPlayer> {
             height: 100.0,
             child: Row(
               children: [
-                // Image Container
                 Container(
                   width: 80.0,
                   height: 80.0,
@@ -149,7 +147,6 @@ class _MiniMediaPlayerState extends State<MiniMediaPlayer> {
                   ),
                 ),
                 SizedBox(width: 12.0),
-                // Song Details and Duration
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -168,10 +165,10 @@ class _MiniMediaPlayerState extends State<MiniMediaPlayer> {
                               overflow: TextOverflow.ellipsis,
                             ),
                           ),
-                          SizedBox(width: 4.0), // Add some spacing
+                          SizedBox(width: 4.0),
                           Container(
                             constraints: BoxConstraints(
-                              maxWidth: 60.0, // Adjust max width as needed
+                              maxWidth: 60.0,
                             ),
                             child: Text(
                               _formatDuration(_songDuration),
@@ -207,7 +204,6 @@ class _MiniMediaPlayerState extends State<MiniMediaPlayer> {
                         ],
                       ),
                       SizedBox(height: 8.0),
-                      // Controls Row
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [

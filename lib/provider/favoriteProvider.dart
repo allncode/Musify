@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import 'package:fluttertoast/fluttertoast.dart';
-import '../widget.dart'; // Import your Song class
+import '../widget.dart';
 
 class FavoritesNotifier extends ChangeNotifier {
   List<Song> _favorites = [];
@@ -77,7 +77,6 @@ class FavoritesNotifier extends ChangeNotifier {
     }
   }
 
-  // Public method to expose loading favorites functionality
   Future<void> loadFavorites() async {
     await _loadFavorites();
   }

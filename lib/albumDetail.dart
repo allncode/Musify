@@ -39,28 +39,33 @@ class _AlbumDetailScreenState extends State<AlbumDetailScreen> {
   void _showSimpleBottomSheet(BuildContext context) {
     showModalBottomSheet(
       context: context,
-      backgroundColor: Colors.black87,
-      builder: (context) => Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          ListTile(
-            leading: Icon(Icons.add, color: Colors.white),
-            title:
-                Text('Add to Library', style: TextStyle(color: Colors.white)),
-            onTap: () {
-              Navigator.pop(context);
-              // Your action here
-            },
-          ),
-          ListTile(
-            leading: Icon(Icons.info, color: Colors.white),
-            title: Text('Song Details', style: TextStyle(color: Colors.white)),
-            onTap: () {
-              Navigator.pop(context);
-              // Your action here
-            },
-          ),
-        ],
+      backgroundColor: Colors.black87, // Set the background color to black
+      builder: (context) => Container(
+        color:
+            Colors.black87, // Ensure the container also has a black background
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: Icon(Icons.add, color: Colors.white),
+              title:
+                  Text('Add to Library', style: TextStyle(color: Colors.white)),
+              onTap: () {
+                Navigator.pop(context);
+                // Your action here
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.info, color: Colors.white),
+              title:
+                  Text('Song Details', style: TextStyle(color: Colors.white)),
+              onTap: () {
+                Navigator.pop(context);
+                // Your action here
+              },
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -68,7 +73,7 @@ class _AlbumDetailScreenState extends State<AlbumDetailScreen> {
   @override
   Widget build(BuildContext context) {
     final favoritesNotifier = Provider.of<FavoritesNotifier>(context);
-
+    final Album album;
     return Scaffold(
       backgroundColor: Colors.black,
       body: Stack(
@@ -87,13 +92,24 @@ class _AlbumDetailScreenState extends State<AlbumDetailScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        widget.title,
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 24.0,
-                          fontWeight: FontWeight.bold,
-                        ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            widget.title,
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 24.0,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          IconButton(
+                            icon: Icon(Icons.more_vert, color: Colors.white),
+                            onPressed: () {
+                              _showSimpleBottomSheet(context);
+                            },
+                          ),
+                        ],
                       ),
                       Text(
                         widget.artist,
@@ -125,31 +141,38 @@ class _AlbumDetailScreenState extends State<AlbumDetailScreen> {
                                 fit: BoxFit.cover,
                               ),
                             ),
-                            title: Text(song.title,
-                                style: TextStyle(color: Colors.white)),
-                            subtitle: Text(song.artist,
-                                style: TextStyle(color: Colors.grey)),
-                            trailing: Row(
-                              mainAxisSize: MainAxisSize.min,
+                            title: Row(
                               children: [
-                                IconButton(
-                                  icon: Icon(Icons.play_arrow,
-                                      color: Colors.white),
-                                  onPressed: () {
-                                    _handleSongTap(song);
-                                  },
-                                ),
-                                IconButton(
-                                  icon: Icon(Icons.more_vert,
-                                      color: Colors.white),
-                                  onPressed: () {
-                                    _showSimpleBottomSheet(context);
-                                  },
+                                Expanded(
+                                  child: Text(
+                                    song.title,
+                                    style: TextStyle(color: Colors.white),
+                                  ),
                                 ),
                               ],
                             ),
+                            subtitle: Text(
+                              song.artist,
+                              style: TextStyle(color: Colors.grey),
+                            ),
+                            trailing: IconButton(
+                              icon: Icon(Icons.play_arrow, color: Colors.white),
+                              onPressed: () {
+                                _handleSongTap(song);
+                              },
+                            ),
                             onTap: () {
-                              _handleSongTap(song);
+                              showModalBottomSheet(
+                                context: context,
+                                backgroundColor: Colors.transparent,
+                                builder: (context) {
+                                  return PhotoCard(
+                                    title: song.title,
+                                    artist: song.artist,
+                                    assetPath: song.assetPath,
+                                  );
+                                },
+                              );
                             },
                           );
                         },
