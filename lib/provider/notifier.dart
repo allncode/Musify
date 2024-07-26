@@ -15,16 +15,22 @@ class RecentlyViewedNotifier extends ChangeNotifier {
   List<Album> get recentlyViewed => _recentlyViewed;
 
   void addAlbum(Album album) {
+    // Remove the album if it already exists in the list
     _recentlyViewed.remove(album);
 
+    // Insert the album at the start of the list
     _recentlyViewed.insert(0, album);
 
+    // Limit the number of items in the list to _maxItems
     final int _maxItems = 10;
     if (_recentlyViewed.length > _maxItems) {
       _recentlyViewed.removeLast();
     }
 
+    // Save the updated list to persistent storage
     _saveRecentlyViewed();
+
+    // Notify listeners about the change
     notifyListeners();
   }
 

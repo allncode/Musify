@@ -39,10 +39,12 @@ class _MyHomePageState extends State<MyHomePage> {
     recentlyPlayedNotifier.setUserId(userId);
     favoritesNotifier.setUserId(userId);
   }
-void _handleLogin(String newUserId) {
-  final favoritesNotifier = Provider.of<FavoritesNotifier>(context, listen: false);
-  favoritesNotifier.setUserId(newUserId);
-}
+
+  void _handleLogin(String newUserId) {
+    final favoritesNotifier =
+        Provider.of<FavoritesNotifier>(context, listen: false);
+    favoritesNotifier.setUserId(newUserId);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -63,7 +65,7 @@ void _handleLogin(String newUserId) {
           },
         ),
         title: Text(
-          'Musify',
+          'Musico',
           style: GoogleFonts.poppins(
               fontSize: 15, color: Colors.white, fontWeight: FontWeight.w400),
         ),

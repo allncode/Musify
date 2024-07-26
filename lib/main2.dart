@@ -178,7 +178,20 @@ class _MySpotifyState extends State<MySpotify> {
     setState(() {
       _currentSong = song;
       _isPlaying = true;
-      _addToRecentlyPlayed(song); // Add to recently played when song is tapped
+    });
+
+    _playSong(song);
+  }
+
+  void _playSong(Song song) async {
+    final playbackNotifier =
+        Provider.of<PlaybackNotifier>(context, listen: false);
+
+    await playbackNotifier.loadSong(song);
+
+    setState(() {
+      _currentSong = song;
+      _isPlaying = playbackNotifier.isPlaying;
     });
   }
 
@@ -282,7 +295,7 @@ class _MySpotifyState extends State<MySpotify> {
             builder: (context, favoritesNotifier, child) {
               return MiniMediaPlayer(
                 song: favoritesNotifier.currentSong,
-                // onTap: () {}, // Provide your own callback if needed
+                onTap: () {}, // Provide your own callback if needed
                 onMoreOptionsTap: () {}, // Provide your own callback if needed
                 onFavoriteTap:
                     _handleFavoriteTap, // Callback for favorite button
@@ -579,8 +592,4 @@ class _MySpotifyState extends State<MySpotify> {
       ),
     );
   }
-
-  void _handleNextTap() {}
-
-  void _handlePreviousTap() {}
 }

@@ -71,9 +71,9 @@ class _MyChooseAccPageState extends State<MyChooseAccPage> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Image.asset(
-                'assets/images/logo2.png',
-                width: 150,
-                height: 150,
+                'assets/images/ic_launcher.png', // Replace with your logo asset path
+                width: 250,
+                height: 250,
               ),
               const SizedBox(height: 20),
               Text(

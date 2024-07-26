@@ -92,6 +92,8 @@ class Album {
             .map((songJson) => Song.fromJson(songJson))
             .toList(),
       );
+  @override
+  int get hashCode => title.hashCode ^ artist.hashCode ^ assetPath.hashCode;
 }
 
 final List<Album> albums = [
@@ -105,7 +107,7 @@ final List<Album> albums = [
         title: 'Salamin, Salamin',
         artist: 'BINI',
         assetPath: 'assets/covers/salamin, salamin.jpg',
-        mp3Path: 'assets/audio/salamin, salamin.mp3',
+        mp3Path: 'audio/salamin_salamin.mp3',
       ),
       Song(
         id: 'bini_pantropiko', // Unique ID
@@ -119,28 +121,28 @@ final List<Album> albums = [
         title: 'Karera',
         artist: 'BINI',
         assetPath: 'assets/covers/karera.jpg',
-        mp3Path: 'assets/audio/karera.mp3',
+        mp3Path: 'audio/karera.mp3',
       ),
       Song(
         id: 'bini_lagi', // Unique ID
         title: 'Lagi',
         artist: 'BINI',
         assetPath: 'assets/covers/lagi.jpg',
-        mp3Path: 'assets/audio/lagi.mp3',
+        mp3Path: 'audio/lagi.mp3',
       ),
       Song(
         id: 'bini_na_na_na', // Unique ID
         title: 'Na Na Na',
         artist: 'BINI',
         assetPath: 'assets/covers/na na na.jpg',
-        mp3Path: 'assets/audio/na_na_na.mp3',
+        mp3Path: 'audio/na_na_na.mp3',
       ),
       Song(
         id: 'bini_cherry_on_top', // Unique ID
         title: 'Cherry On Top',
         artist: 'BINI',
         assetPath: 'assets/covers/cherry on top.jpg',
-        mp3Path: 'assets/audio/cherry_on_top.mp3',
+        mp3Path: 'audio/cherry_on_top.mp3',
       ),
       // Add more songs here with unique IDs
     ],
@@ -155,35 +157,35 @@ final List<Album> albums = [
         title: 'sining (feat. Jay R)',
         artist: 'Dionela',
         assetPath: 'assets/covers/sining.jpg',
-        mp3Path: 'assets/audio/sining.mp3',
+        mp3Path: 'audio/sining.mp3',
       ),
       Song(
         id: 'dionela_hoodie', // Unique ID
         title: 'Hoodie (feat. Alisson Shore)',
         artist: 'Dionela',
         assetPath: 'assets/covers/hoodie.jpg',
-        mp3Path: 'assets/audio/hoodie_feat_alisson_shore.mp3',
+        mp3Path: 'audio/hoodie_feat_alisson_shore.mp3',
       ),
       Song(
         id: 'dionela_musika', // Unique ID
         title: 'Musika',
         artist: 'Dionela',
         assetPath: 'assets/covers/musika.jpg',
-        mp3Path: 'assets/audio/musika.mp3',
+        mp3Path: 'audio/musika.mp3',
       ),
       Song(
         id: 'dionela_oksihina', // Unique ID
         title: 'Oksihina',
         artist: 'Dionela',
         assetPath: 'assets/covers/oksihina.jpg',
-        mp3Path: 'assets/audio/oksihina.mp3',
+        mp3Path: 'audio/oksihina.mp3',
       ),
       Song(
         id: 'dionela_153', // Unique ID
         title: '153',
         artist: 'Dionela',
         assetPath: 'assets/covers/153.jpg',
-        mp3Path: 'assets/audio/153.mp3',
+        mp3Path: 'audio/153.mp3',
       ),
       // Add more songs here with unique IDs
     ],
@@ -198,35 +200,35 @@ final List<Album> albums = [
         title: 'Dilaw',
         artist: 'Maki',
         assetPath: 'assets/covers/dilaw.jpg',
-        mp3Path: 'assets/audio/dilaw.mp3',
+        mp3Path: 'audio/dilaw.mp3',
       ),
       Song(
         id: 'maki_saan', // Unique ID
         title: 'Saan?',
         artist: 'Maki',
         assetPath: 'assets/covers/saan.jpg',
-        mp3Path: 'assets/audio/saan.mp3',
+        mp3Path: 'audio/saan.mp3',
       ),
       Song(
         id: 'maki_kailan', // Unique ID
         title: 'Kailan?',
         artist: 'Maki',
         assetPath: 'assets/covers/kailan.jpg',
-        mp3Path: 'assets/audio/kailan.mp3',
+        mp3Path: 'audio/kailan.mp3',
       ),
       Song(
         id: 'maki_sikulo', // Unique ID
         title: 'Sikulo',
         artist: 'Maki',
         assetPath: 'assets/covers/sikulo.jpg',
-        mp3Path: 'assets/audio/sikulo.mp3',
+        mp3Path: 'audio/sikulo.mp3',
       ),
       Song(
         id: 'maki_bakit', // Unique ID
         title: 'Bakit?',
         artist: 'Maki',
         assetPath: 'assets/covers/bakit.jpg',
-        mp3Path: 'assets/audio/bakit.mp3',
+        mp3Path: 'audio/bakit.mp3',
       ),
       // Add more songs here with unique IDs
     ],
@@ -241,35 +243,35 @@ final List<Album> albums = [
         title: 'Raining In Manila',
         artist: 'Lola Amour',
         assetPath: 'assets/covers/rain.png',
-        mp3Path: 'assets/music/raining_in_manila.mp3',
+        mp3Path: 'audio/raining_in_manila.mp3',
       ),
       Song(
         id: 'lolaamour_fallen', // Unique ID
         title: 'Fallen',
         artist: 'Lola Amour',
         assetPath: 'assets/covers/fallen.png',
-        mp3Path: 'assets/music/fallen.mp3',
+        mp3Path: 'audio/fallen.mp3',
       ),
       Song(
         id: 'lolaamour_dahan_dahan', // Unique ID
         title: 'dahan-dahan',
         artist: 'Lola Amour',
         assetPath: 'assets/covers/dahan.png',
-        mp3Path: 'assets/music/dahan_dahan.mp3',
+        mp3Path: 'audio/dahan_dahan.mp3',
       ),
       Song(
         id: 'lolaamour_pwede_ba', // Unique ID
         title: 'Pwede Ba',
         artist: 'Lola Amour',
         assetPath: 'assets/covers/pwede.png',
-        mp3Path: 'assets/music/pwede_ba.mp3',
+        mp3Path: 'audio/pwede_ba.mp3',
       ),
       Song(
         id: 'lolaamour_namimiss_ko_na', // Unique ID
         title: 'Namimiss Ko Na',
         artist: 'Lola Amour',
         assetPath: 'assets/covers/miss.png',
-        mp3Path: 'assets/music/namimiss_ko_na.mp3',
+        mp3Path: 'audio/namimiss_ko_na.mp3',
       ),
       // Add more songs here with unique IDs
     ],
@@ -284,35 +286,35 @@ final List<Album> albums = [
         title: 'Mahika',
         artist: 'Adie',
         assetPath: 'assets/covers/mahika.png',
-        mp3Path: 'assets/music/mahika.mp3',
+        mp3Path: 'audio/mahika.mp3',
       ),
       Song(
         id: 'adie_tahanan', // Unique ID
         title: 'Tahanan',
         artist: 'Adie',
         assetPath: 'assets/covers/tahan.png',
-        mp3Path: 'assets/music/tahanan.mp3',
+        mp3Path: 'audio/tahanan.mp3',
       ),
       Song(
         id: 'adie_paraluman', // Unique ID
         title: 'Paraluman',
         artist: 'Adie',
         assetPath: 'assets/covers/paraluman.png',
-        mp3Path: 'assets/music/paraluman.mp3',
+        mp3Path: 'audio/paraluman.mp3',
       ),
       Song(
         id: 'adie_oh_giliw', // Unique ID
         title: 'Oh, Giliw',
         artist: 'Adie',
         assetPath: 'assets/covers/giliw.png',
-        mp3Path: 'assets/music/oh_giliw.mp3',
+        mp3Path: 'audio/oh_giliw.mp3',
       ),
       Song(
         id: 'adie_kursunada', // Unique ID
         title: 'Kursunada',
         artist: 'Adie',
         assetPath: 'assets/covers/kursunada.png',
-        mp3Path: 'assets/music/kursunada.mp3',
+        mp3Path: 'audio/kursunada.mp3',
       ),
       // Add more songs here with unique IDs
     ],

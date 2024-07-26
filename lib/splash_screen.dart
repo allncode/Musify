@@ -4,6 +4,8 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'widget.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import 'package:firebase_auth/firebase_auth.dart'; // Add this import
+
 class MySplashScreen extends StatefulWidget {
   const MySplashScreen({super.key});
 
@@ -17,18 +19,37 @@ class _MySplashScreenState extends State<MySplashScreen>
   void initState() {
     super.initState();
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersive);
-    Future.delayed(const Duration(seconds: 4), () {
+
+    // Check authentication state and navigate accordingly
+    _checkAuthState();
+  }
+
+  Future<void> _checkAuthState() async {
+    await Future.delayed(const Duration(seconds: 4));
+    final user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      // User is logged in, navigate to MyHomePage with email
       Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (_) => const MyChooseAccPage()));
-    });
+        MaterialPageRoute(
+          builder: (_) => MyHomePage(email: user.email ?? ''),
+        ),
+      );
+    } else {
+      // User is not logged in, navigate to MyChooseAccPage
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (_) => const MyChooseAccPage()),
+      );
+    }
   }
 
   @override
   void dispose() {
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual,
         overlays: SystemUiOverlay.values);
+    super.dispose();
   }
 
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
