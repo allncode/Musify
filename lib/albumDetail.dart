@@ -21,8 +21,54 @@ class AlbumDetailScreen extends StatefulWidget {
 }
 
 class _AlbumDetailScreenState extends State<AlbumDetailScreen> {
+  void _playSong(Song song) {
+    // Logic to play the song (e.g., play the song using an audio player)
+  }
+
+  void _handleSongTap(Song song) {
+    final favoritesNotifier =
+        Provider.of<FavoritesNotifier>(context, listen: false);
+
+    // Update the currently playing song in the provider
+    favoritesNotifier.setCurrentSong(song);
+
+    // Optionally, you can also play the song
+    _playSong(song);
+  }
+
+  void _showSimpleBottomSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.black87,
+      builder: (context) => Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          ListTile(
+            leading: Icon(Icons.add, color: Colors.white),
+            title:
+                Text('Add to Library', style: TextStyle(color: Colors.white)),
+            onTap: () {
+              Navigator.pop(context);
+              // Your action here
+            },
+          ),
+          ListTile(
+            leading: Icon(Icons.info, color: Colors.white),
+            title: Text('Song Details', style: TextStyle(color: Colors.white)),
+            onTap: () {
+              Navigator.pop(context);
+              // Your action here
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    final favoritesNotifier = Provider.of<FavoritesNotifier>(context);
+
     return Scaffold(
       backgroundColor: Colors.black,
       body: Stack(
@@ -90,53 +136,20 @@ class _AlbumDetailScreenState extends State<AlbumDetailScreen> {
                                   icon: Icon(Icons.play_arrow,
                                       color: Colors.white),
                                   onPressed: () {
-                                    // Handle play button press
+                                    _handleSongTap(song);
                                   },
                                 ),
                                 IconButton(
                                   icon: Icon(Icons.more_vert,
                                       color: Colors.white),
                                   onPressed: () {
-                                    void _showSimpleBottomSheet(
-                                        BuildContext context) {
-                                      showModalBottomSheet(
-                                        context: context,
-                                        backgroundColor: Colors.black87,
-                                        builder: (context) => Column(
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            ListTile(
-                                              leading: Icon(Icons.add,
-                                                  color: Colors.white),
-                                              title: Text('Add to Library',
-                                                  style: TextStyle(
-                                                      color: Colors.white)),
-                                              onTap: () {
-                                                Navigator.pop(context);
-                                                // Your action here
-                                              },
-                                            ),
-                                            ListTile(
-                                              leading: Icon(Icons.info,
-                                                  color: Colors.white),
-                                              title: Text('Song Details',
-                                                  style: TextStyle(
-                                                      color: Colors.white)),
-                                              onTap: () {
-                                                Navigator.pop(context);
-                                                // Your action here
-                                              },
-                                            ),
-                                          ],
-                                        ),
-                                      );
-                                    }
+                                    _showSimpleBottomSheet(context);
                                   },
                                 ),
                               ],
                             ),
                             onTap: () {
-                              // Optionally handle song tap
+                              _handleSongTap(song);
                             },
                           );
                         },

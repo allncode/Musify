@@ -29,6 +29,8 @@ class _MySpotifyState extends State<MySpotify> {
   List<dynamic> recentlyViewed = [];
   Song? _currentSong;
   List<Song> recentlyPlayed = [];
+  List<Song> _songs = [];
+  int _currentSongIndex = 0;
   bool _isPlaying = false;
   ///////////////////////////////////////////////////////////////////////
   final List<Widget> _pages = [
@@ -219,6 +221,22 @@ class _MySpotifyState extends State<MySpotify> {
     return null;
   }
 
+  void _playNextSong() {
+    setState(() {
+      if (_currentSongIndex < _songs.length - 1) {
+        _currentSongIndex++;
+      }
+    });
+  }
+
+  void _playPreviousSong() {
+    setState(() {
+      if (_currentSongIndex > 0) {
+        _currentSongIndex--;
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -298,12 +316,12 @@ class _MySpotifyState extends State<MySpotify> {
                 onTap: () {}, // Provide your own callback if needed
                 onMoreOptionsTap: () {}, // Provide your own callback if needed
                 onFavoriteTap:
-                    _handleFavoriteTap, // Callback for favorite button
-                onPlayPauseTap:
-                    _handlePlayPauseTap, // Callback for play/pause button
+                    _handleFavoriteTap, // This toggles the favorite status
+                onPlayPauseTap: _handlePlayPauseTap, onNextTap: _playNextSong,
+                onPrevTap: _playPreviousSong,
               );
             },
-          )
+          ),
         ]);
   }
 
@@ -347,7 +365,7 @@ class _MySpotifyState extends State<MySpotify> {
             SizedBox(height: 16.0),
             Text(
               'Popular albums',
-              style: TextStyle(color: Colors.white, fontSize: 18.0),
+              style: TextStyle(color: Colors.white, fontSize: 21.0),
             ),
             SizedBox(height: 8.0),
             Container(
@@ -365,7 +383,7 @@ class _MySpotifyState extends State<MySpotify> {
             SizedBox(height: 30.0),
             Text(
               'Songs',
-              style: TextStyle(color: Colors.white, fontSize: 18.0),
+              style: TextStyle(color: Colors.white, fontSize: 21.0),
             ),
             SizedBox(height: 8.0),
             Container(
@@ -384,7 +402,7 @@ class _MySpotifyState extends State<MySpotify> {
             if (recentlyViewed.isNotEmpty) ...[
               Text(
                 'Recently Viewed',
-                style: TextStyle(color: Colors.white, fontSize: 18.0),
+                style: TextStyle(color: Colors.white, fontSize: 21.0),
               ),
               SizedBox(height: 8.0),
               Container(
@@ -415,7 +433,7 @@ class _MySpotifyState extends State<MySpotify> {
             if (recentlyPlayed.isNotEmpty) ...[
               Text(
                 'Recently Played Songs',
-                style: TextStyle(color: Colors.white, fontSize: 18.0),
+                style: TextStyle(color: Colors.white, fontSize: 21.0),
               ),
               SizedBox(height: 8.0),
               Container(
